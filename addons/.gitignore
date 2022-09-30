@@ -2,3 +2,5 @@
 !.gitignore
 !.htaccess
 !index.html
+!/sample
+!/sample/*

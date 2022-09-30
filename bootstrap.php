@@ -148,6 +148,17 @@ function maya($module = null) {
             $client = new MongoHybrid\Client($config['database']['server'], $config['database']['options'], $config['database']['driverOptions']);
             return $client;
         });
+        // check whether maya is already installed
+        if(MAYA_ADMIN && !MAYA_API_REQUEST){
+            if (!$app->path('#storage:data/maya.sqite')) {
+                try {
+                    if (!$app->storage->getCollection('maya/accounts')->count()) {
+                        include(__DIR__."/install/index.php");
+                        exit;
+                    }
+                } catch(Exception $e) { }
+            }
+        }
 
         // file storage
         $app->service('filestorage', function() use($config, $app) {
