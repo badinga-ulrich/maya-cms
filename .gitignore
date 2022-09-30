@@ -28,8 +28,11 @@ addons/
 !.gitkeep
 !/storage/*/index.html
 !/storage/*/.htaccess
-!/storage/collections
+!/addons/*/index.html
+!/addons/*/.htaccess
 !/storage/assets
+!/storage/assets/*
+!/storage/mimes.php
 defines.php
 # Sublime Text
 *.sublime-workspace
