@@ -28,8 +28,10 @@ addons/
 !.gitkeep
 !/storage/*/index.html
 !/storage/*/.htaccess
-!/addons/*/index.html
-!/addons/*/.htaccess
+!/addons/index.html
+!/addons/
+!/addons/.gitignore
+!/addons/.htaccess
 !/storage/assets
 !/storage/assets/*
 !/storage/mimes.php
