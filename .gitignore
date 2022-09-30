@@ -30,6 +30,8 @@ addons/
 !/storage/*/.htaccess
 !/addons/index.html
 !/addons/
+!/config
+!/config/*
 !/addons/.gitignore
 !/addons/.htaccess
 !/storage/assets
