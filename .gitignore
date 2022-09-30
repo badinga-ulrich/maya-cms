@@ -34,6 +34,7 @@ addons/
 !/config/*
 !/addons/.gitignore
 !/addons/.htaccess
+!/addons/sample/
 !/storage/assets
 !/storage/assets/*
 !/storage/mimes.php
