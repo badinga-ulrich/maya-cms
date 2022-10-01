@@ -63,7 +63,7 @@ $app->on("admin.dashboard.widgets", function($widgets) {
         $widgets[] = [
             "name" => "groups",
             "content" => $this->view("groups:views/partials/widget.php", compact('title', 'groups')),
-            "area" => 'main'
+            "area" => 'aside-right'
         ];
     }
 }, 100);

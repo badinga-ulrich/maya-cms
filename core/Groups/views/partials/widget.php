@@ -1,6 +1,6 @@
 <div>
    <div class="uk-panel-box uk-panel-card">
-      <div class="uk-panel-box-header uk-flex">
+      <div class="uk-panel-box-header uk-flex  uk-flex-middle">
          <strong class="uk-panel-box-header-title uk-flex-item-1">
             @lang('Groups')
 
@@ -36,9 +36,11 @@
                     @endforeach
                 </ul>
             </div>
+            @if(count($collections) > 5)
             <div class="uk-panel-box-footer">
-                <a href="@route('/groups')">@lang('See all')</a>
+                <a href="@route('/groups')">@lang('Show all')</a>
             </div>
+            @endif
         @else
             <div class="uk-margin uk-text-center uk-text-muted">
                 <p>
