@@ -483,32 +483,38 @@ class App implements \ArrayAccess {
     */
     public function trigger($event,$params=[]){
 
-        if (!isset($this->events[$event])){
-            return $this;
-        }
-
-        if (!\count($this->events[$event])){
-            return $this;
-        }
-
-        $queue = new \SplPriorityQueue();
-
-        foreach ($this->events[$event] as $index => $action){
-            $queue->insert($index, $action['prio']);
-        }
-
-        $queue->top();
-
-        while ($queue->valid()){
-            $index = $queue->current();
-            if (\is_callable($this->events[$event][$index]['fn'])){
-                if (\call_user_func_array($this->events[$event][$index]['fn'], $params) === false) {
-                    break; // stop Propagation
-                }
+        $events = array_filter(array_keys( array_merge(["maya.{bootstrap}"=>""],$this->events)), function($eventName) use($event){
+            $_event = "`^".str_replace("@",".*",preg_quote(preg_replace("#\{[^\}]+\}#","@",$eventName),"`"))."$`";
+            return preg_match($_event,$event);
+        });
+        foreach ($events as $event ) {       
+            if (!isset($this->events[$event])){
+                continue;
             }
-            $queue->next();
-        }
 
+            if (!\count($this->events[$event])){
+                continue;
+            }
+
+            $queue = new \SplPriorityQueue();
+
+            foreach ($this->events[$event] as $index => $action){
+                $queue->insert($index, $action['prio']);
+            }
+
+            $queue->top();
+
+            while ($queue->valid()){
+                $index = $queue->current();
+                if (\is_callable($this->events[$event][$index]['fn'])){
+                    if (\call_user_func_array($this->events[$event][$index]['fn'], $params) === false) {
+                        break; // stop Propagation
+                    }
+                }
+                $queue->next();
+            }
+
+        }
         return $this;
     }
 
@@ -523,7 +529,7 @@ class App implements \ArrayAccess {
         $this->trigger('app.render.view', [&$____template, &$_____slots]);
 
         if (\is_string($____template) && $____template) {
-            $this->trigger("app.render.view/{$____template}", [&$____template, &$slots]);
+            $this->trigger("app.render.view/{$____template}", [&$____template, &$_____slots]);
         }
 
         $_____slots = \array_merge($this->viewvars, $_____slots);

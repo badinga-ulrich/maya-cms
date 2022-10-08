@@ -35,8 +35,8 @@ class Pagination {
 
     public function current($page = null) {
 
-        if ($current && intval($current) && $current <= $this->pages) {
-            $this->current = intval($current);
+        if ($this->current && intval($this->current) && $this->current <= $this->pages) {
+            $this->current = intval($this->current);
             $this->offset  = ($this->current-1) * $this->limit;
         }
 

@@ -1,13 +1,13 @@
 <?php
 /**
- * Maya sample addon
+ * This file is part of the Maya project.
  *
- * @author  Badinga Ulrich
- * @package maya-cms
- * @license MIT
+ * (c) Ulrich Badinga - 🅱🅰🅳🅻🅴🅴, https://badinga-ulrich.github.io/
  *
- * @uses curl $MAYA_HOST/api/sample
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
 // add url only if the request start with /api/*
 if(MAYA_API_REQUEST){
     // Test page (REST API)

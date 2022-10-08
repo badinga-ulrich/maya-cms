@@ -9,7 +9,8 @@ $collections = maya('collections')->collections();
 
 foreach ($collections as $name => &$meta) {
 
-    $_name = $name.'Collection';
+    // $_name = $name.'Collection';
+    $_name = $name;
 
     $queries['fields'][$_name] = [
 
@@ -19,6 +20,8 @@ foreach ($collections as $name => &$meta) {
 
                 $fields = array_merge([
                     '_id'       => Type::nonNull(Type::string()),
+                    '_by' => Type::string(),
+                    '_mby' => Type::string(),
                     '_created'  => Type::nonNull(Type::int()),
                     '_modified' => Type::nonNull(Type::int())
                 ], FieldType::buildFieldsDefinitions($meta));

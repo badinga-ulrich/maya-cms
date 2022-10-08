@@ -48,7 +48,6 @@ class Accounts extends \Maya\AuthController {
         $fields    = $this->app->retrieve('config/account/fields', null);
         $languages = $this->getLanguages();
         $groups    = $this->module('maya')->getGroups();
-
         if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($uid, $meta)) {
             return $this->render('maya:views/base/locked.php', compact('meta'));
         }

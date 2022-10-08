@@ -265,7 +265,7 @@ class Client {
      * @param  string $key
      * @return array
      */
-    public function hgetall($key) {
+    public function hgetall($collection, $key) {
 
         $set = $this->getKey($collection, $key, []);
 
@@ -294,7 +294,7 @@ class Client {
      * @param  string $key
      * @return array
      */
-    public function hkeys($key) {
+    public function hkeys($collection, $key) {
 
         $set = $this->getKey($collection, $key, []);
 
@@ -308,7 +308,7 @@ class Client {
      * @param  string $key
      * @return array
      */
-    public function hvals($key) {
+    public function hvals($collection,$key) {
 
         $set = $this->getKey($collection, $key, []);
 
@@ -334,7 +334,7 @@ class Client {
      * @param  string $key
      * @return integer
      */
-    public function hdel($key) {
+    public function hdel($collection,$key) {
 
         $set = $this->getKey($collection, $key, []);
 
@@ -383,7 +383,7 @@ class Client {
      * @param  string $key
      * @return array
      */
-    public function hmget($key) {
+    public function hmget($collection,$key) {
 
         $set     = $this->getKey($collection, $key, []);
         $fields  = func_get_args();
@@ -402,13 +402,15 @@ class Client {
      *
      * @param  string $collection
      * @param  string $key
+     * @example Usage $mongoClient->hmset("collectionName","key1",$value, "key2", $value2...)
      */
-    public function hmset($key) {
+    public function hmset($collection,$key) {
 
         $set     = $this->getKey($collection, $key, []);
         $args    = func_get_args();
+        $cnt  = count($args);
 
-        for ($i=1; $i<count($fields); $i++){
+        for ($i=1; $i<$cnt; $i++){
             $field = $args[$i];
             $value = isset($args[($i+1)]) ? $args[($i+1)] : null;
 

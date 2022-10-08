@@ -141,7 +141,12 @@
                         </tbody>
                     </table>
                 </div>
-
+                <div>
+                    <p>
+                        <strong><span class="uk-badge app-badge">SSE</span></strong>
+                    </p>
+                </div>
+                
             @trigger("maya.settings.infopage.main.menu")
             </div>
 
@@ -155,6 +160,7 @@
             <ul class="uk-nav uk-nav-side" data-uk-switcher="connect:'#settings-info'">
                 <li><a href="#SYSTEM">System</a></li>
                 <li><a href="#PHP">PHP</a></li>
+                <li><a href="#SSE">SSE</a></li>
                 @trigger("maya.settings.infopage.aside.menu")
             </ul>
 
@@ -165,19 +171,27 @@
 
             var $this = this;
 
+
             this._system = {};
             this.system  = {{ json_encode($info['app']) }};
+            this.user = {{json_encode($app->module('maya')->getUser())}};
             this.jobsQueue = {{ json_encode($info['jobs_queue']) }};
             this.cacheSize = null;
             this.loading = false;
-
+            
             this.on('mount', function() {
-
+                
                 App.request('/maya/utils/getCacheSize').then(function(rsp) {
-
+                    
                     $this.cacheSize = rsp.size ? rsp.size_pretty : 0;
                     $this.update();
                 });
+                if($this.user["api_key"]){
+                    const source = new EventSource('/api/sse/listen?token='+$this.user["api_key"], {withCredentials: true});
+                    source.addEventListener('collections.find.after.posts', function (event) {
+                        console.log(JSON.parse(event.data));
+                    }, false);
+                }
 
             });
 

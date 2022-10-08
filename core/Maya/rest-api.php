@@ -33,7 +33,7 @@ $this->on('before', function() {
 
         // is account token?
         if ($token && preg_match('/account-/', $token)) {
-
+            
             $account = $this->storage->findOne('maya/accounts', ['api_key' => $token]);
 
             if ($account) {

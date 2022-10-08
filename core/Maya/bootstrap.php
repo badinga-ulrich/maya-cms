@@ -17,7 +17,7 @@ $this->helpers['jobs']       = 'Maya\\Helper\\Jobs';
 
 // API
 $this->module('maya')->extend([
-    'publicFile' => function($params)use($app){
+    'publicFile' => function($params){
         $mimeTypeFile = MAYA_STORAGE_FOLDER.'/mimes.php';
         if(!is_file($mimeTypeFile )){
             function generateUpToDateMimeArray($url){
@@ -85,10 +85,18 @@ $this->module('maya')->extend([
             file_put_contents($mimeTypeFile ,generateUpToDateMimeArray('http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types'));
         }
         $mimes =  include($mimeTypeFile);
-        if ($file = $app->path('#public:'.$params->route)) {
+        if ($file = $this->app->path('#public:'.$params->route)) {
             $mime = pathinfo($file)["extension"];
             if($mime == "php"){
-                include($file);
+                ob_start();
+                try {
+                    include($file);
+                } catch (\Throwable $th) {
+                    ob_clean();
+                    throw $th;
+                }finally{
+                    ob_end_flush();
+                }
             }else{
                 $mime = $mimes[$mime];
                 header('Content-Type: '.($mime === false ? "application/octet-stream" : $mime));
@@ -99,7 +107,7 @@ $this->module('maya')->extend([
         }
         return false;
     },
-    'markdown' => function($content, $extra = false) use($app) {
+    'markdown' => function($content, $extra = false) {
 
         static $parseDown;
         static $parsedownExtra;
@@ -110,7 +118,7 @@ $this->module('maya')->extend([
         return $extra ? $parsedownExtra->text($content) : $parseDown->text($content);
     },
 
-    'clearCache' => function() use($app) {
+    'clearCache' => function() {
 
         $dirs = ['#cache:','#tmp:','#thumbs:', '#pstorage:tmp'];
 
@@ -120,7 +128,7 @@ $this->module('maya')->extend([
 
         foreach ($dirs as $dir) {
 
-            $path = $app->path($dir);
+            $path = $this->app->path($dir);
             $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::SELF_FIRST);
 
             foreach ($files as $file) {
@@ -131,22 +139,22 @@ $this->module('maya')->extend([
                 @unlink($file->getRealPath());
             }
 
-            $app->helper('fs')->removeEmptySubFolders($path);
+            $this->app->helper('fs')->removeEmptySubFolders($path);
         }
 
-        $app->trigger('maya.clearcache');
+        $this->app->trigger('maya.clearcache');
 
         $size = 0;
 
         foreach ($dirs as $dir) {
-            $size += $app->helper('fs')->getDirSize($dir);
+            $size += $this->app->helper('fs')->getDirSize($dir);
         }
 
         if (function_exists('opcache_reset')) {
             opcache_reset();
         }
 
-        return ['size'=>$app->helper('utils')->formatSize($size)];
+        return ['size'=>$this->app->helper('utils')->formatSize($size)];
     },
 
     'loadApiKeys' => function() {

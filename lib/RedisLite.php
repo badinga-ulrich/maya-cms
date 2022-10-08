@@ -476,8 +476,8 @@ class RedisLite {
 
         $set     = $this->get($key, array());
         $args    = func_get_args();
-
-        for ($i=1; $i<count($fields); $i++){
+        $cnt     = count($args); 
+        for ($i=0; $i<$cnt; $i++){
             $field = $args[$i];
             $value = isset($args[($i+1)]) ? $args[($i+1)] : null;
 

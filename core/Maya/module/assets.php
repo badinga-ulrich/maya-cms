@@ -22,7 +22,7 @@ $this->module('maya')->extend([
         return compact('assets', 'total');
     },
 
-    'saveAssets' => function($files, $meta = [], $update = false) use($app) {
+    'saveAssets' => function($files, $meta = [], $update = false) {
 
         $files     = isset($files[0]) ? $files : [$files];
         $finfo     = finfo_open(FILEINFO_MIME_TYPE);

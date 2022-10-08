@@ -2,6 +2,10 @@
 
 define('MAYA_INSTALL', true);
 
+if(!function_exists("maya")){
+    include_once(__DIR__."/../bootstrap.php");
+}
+
 $sqlitesupport = false;
 
 // check whether sqlite is supported
@@ -15,7 +19,7 @@ try {
 } catch (Exception $e) { }
 
 
-function ensure_writable($path) {
+function ensure_writable($path, $is_dir = true) {
     try {
         $dir = MAYA_STORAGE_FOLDER.$path;
         if (!file_exists($dir)) {
@@ -41,6 +45,7 @@ $checks = array(
     'MBString extension not available'                  => extension_loaded('mbstring'),
     'Data folder is not writable: /storage/data'        => ensure_writable('/data'),
     'Cache folder is not writable: /storage/cache'      => ensure_writable('/cache'),
+    'Config file is not writable: /config/config.yaml'  => is_file(MAYA_CONFIG_DIR.'/config.yaml') && is_writable(MAYA_CONFIG_DIR.'/config.yaml'),
     'Temp folder is not writable: /storage/tmp'         => ensure_writable('/tmp'),
     'Thumbs folder is not writable: /storage/thumbs'    => ensure_writable('/thumbs'),
     'Uploads folder is not writable: /storage/uploads'  => ensure_writable('/uploads'),

@@ -372,6 +372,18 @@ if (MAYA_API_REQUEST) {
         });
     }
 }
+// register events for autocomplete
+$app->on('maya.webhook.events', function($triggers) {
+
+    foreach([
+        'forms.save.after',
+        'forms.save.after.{$name}',
+        'forms.save.before',
+        'forms.save.before.{$name}',
+        'forms.submit.after',
+        'forms.submit.before',
+    ] as &$evt) { $triggers[] = $evt; }
+});
 
 // ADMIN
 if (MAYA_ADMIN_CP) {

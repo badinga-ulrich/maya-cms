@@ -10,7 +10,8 @@ $singletons = maya('singletons')->singletons();
 
 foreach ($singletons as $name => &$meta) {
 
-    $_name = $name.'Singleton';
+    // $_name = $name.'Singleton';
+    $_name = "_".$name;
 
     $queries['fields'][$_name] = [
 
@@ -20,6 +21,8 @@ foreach ($singletons as $name => &$meta) {
 
                 $fields = array_merge([
                     '_id' => Type::string(),
+                    '_by' => Type::string(),
+                    '_mby' => Type::string(),
                     '_created' => Type::int(),
                     '_modified' =>Type::int()
                 ], FieldType::buildFieldsDefinitions($meta));

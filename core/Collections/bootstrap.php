@@ -508,12 +508,13 @@ $this->module('collections')->extend([
             $single = true;
         }
 
+        $ignoreDefaultFallback = false;
         $filter = array_merge([
             'user' => false,
             'lang' => false,
             'ignoreDefaultFallback' => false
         ], $filter);
-
+        $ignoreDefaultFallback = boolval($filter["ignoreDefaultFallback"]);
         extract($filter);
 
         if (null === $cache) {
@@ -740,7 +741,31 @@ $this->module("collections")->extend([
     }
 ]);
 
+// register events for autocomplete
+$app->on('maya.webhook.events', function($triggers) {
 
+    foreach([
+        'collections.createcollection',
+        'collections.find.after',
+        'collections.find.after.{$name}',
+        'collections.find.before',
+        'collections.find.before.{$name}',
+        'collections.remove.after',
+        'collections.remove.after.{$name}',
+        'collections.remove.before',
+        'collections.remove.before.{$name}',
+        'collections.removecollection',
+        'collections.removecollection.{$name}',
+        'collections.reorder',
+        'collections.reorder.{$name}',
+        'collections.save.after',
+        'collections.save.after.{$name}',
+        'collections.save.before',
+        'collections.save.before.{$name}',
+        'collections.updatecollection',
+        'collections.updatecollection.{$name}'
+    ] as &$evt) { $triggers[] = $evt; }
+});
 // REST
 if (MAYA_API_REQUEST) {
 

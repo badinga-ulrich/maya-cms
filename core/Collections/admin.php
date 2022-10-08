@@ -76,32 +76,6 @@ $app->on('admin.init', function() {
 
     }, 100);
 
-    // register events for autocomplete
-    $this->on('maya.webhook.events', function($triggers) {
-
-        foreach([
-            'collections.createcollection',
-            'collections.find.after',
-            'collections.find.after.{$name}',
-            'collections.find.before',
-            'collections.find.before.{$name}',
-            'collections.remove.after',
-            'collections.remove.after.{$name}',
-            'collections.remove.before',
-            'collections.remove.before.{$name}',
-            'collections.removecollection',
-            'collections.removecollection.{$name}',
-            'collections.reorder',
-            'collections.reorder.{$name}',
-            'collections.save.after',
-            'collections.save.after.{$name}',
-            'collections.save.before',
-            'collections.save.before.{$name}',
-            'collections.updatecollection',
-            'collections.updatecollection.{$name}'
-        ] as &$evt) { $triggers[] = $evt; }
-    });
-
     // update assets references on file update
     $this->on('maya.assets.updatefile', function($asset) {
 
@@ -140,3 +114,4 @@ $app->on('admin.init', function() {
         }
     });
 });
+
