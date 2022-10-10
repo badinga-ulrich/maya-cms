@@ -1,7 +1,7 @@
 <div>
     <ul class="uk-breadcrumb">
-        <li><a href="@route('/singletons')">@lang('Singletons')</a></li>
-        <li class="uk-active"><span>@lang('Singleton')</span></li>
+        <li><a href="@route('/pages')">@lang('Pages')</a></li>
+        <li class="uk-active"><span>@lang('Page')</span></li>
     </ul>
 </div>
 
@@ -15,33 +15,39 @@
             <div class="uk-width-medium-1-4">
 
                 <div class="uk-panel uk-panel-box uk-panel-card">
-
-                   <div class="uk-margin">
+                    <div class="uk-margin">
                        <label class="uk-text-small">@lang('Name')</label>
-                       <input aria-label="@lang('Name')" class="uk-width-1-1 uk-form-large" type="text" ref="name" bind="singleton.name" pattern="[a-zA-Z0-9_]+" required>
-                       <p class="uk-text-small uk-text-muted" if="{!singleton._id}">
+                       <input aria-label="@lang('Name')" class="uk-width-1-1 uk-form-large" type="text" ref="name" bind="page.name" pattern="[a-zA-Z0-9_]+" required>
+                       <p class="uk-text-small uk-text-muted" if="{!page._id}">
                            @lang('Only alpha nummeric value is allowed')
                        </p>
                    </div>
 
                    <div class="uk-margin">
-                       <label class="uk-text-small">@lang('Label')</label>
-                       <input aria-label="@lang('Label')" class="uk-width-1-1 uk-form-large" type="text" ref="label" bind="singleton.label">
+                       <label class="uk-text-small">@lang('Title')</label>
+                       <input aria-label="@lang('Title')" class="uk-width-1-1 uk-form-large" type="text" ref="label" bind="page.label">
                    </div>
 
                    <div class="uk-margin">
                        <label class="uk-text-small">@lang('Group')</label>
-                       <input aria-label="@lang('Group')" class="uk-width-1-1 uk-form-large" type="text" ref="group" bind="singleton.group">
+                       <input aria-label="@lang('Group')" class="uk-width-1-1 uk-form-large" type="text" ref="group" bind="page.group">
+                   </div>
+                   <div class="uk-margin">
+                       <label class="uk-text-small">@lang('Url')</label>
+                       <input aria-label="@lang('Url')" class="uk-width-1-1 uk-form-large" type="text" ref="url" bind="page.url" pattern="/[a-zA-Z0-9_]?(/[a-zA-Z0-9_]+)*" required>
+                       <p class="uk-text-small uk-text-muted" if="{!page._id}">
+                           @lang('Ex. /page, /url/to/page')
+                       </p>
                    </div>
 
                    <div class="uk-margin">
                        <label class="uk-text-small">@lang('Icon')</label>
                        <div data-uk-dropdown="pos:'right-center', mode:'click'">
-                           <a><img class="uk-display-block uk-margin uk-container-center" riot-src="{ singleton.icon ? '@url('assets:app/media/icons/')'+singleton.icon : '@url('singletons:icon.svg')'}" alt="icon" width="100"></a>
+                           <a><img class="uk-display-block uk-margin uk-container-center" riot-src="{ page.icon ? '@url('assets:app/media/icons/')'+page.icon : '@url('pages:icon.svg')'}" alt="icon" width="100"></a>
                            <div class="uk-dropdown uk-dropdown-scrollable uk-dropdown-width-2">
                                 <div class="uk-grid uk-grid-gutter">
                                     <div>
-                                        <a class="uk-dropdown-close" onclick="{ selectIcon }" icon=""><img src="@url('singletons:icon.svg')" width="30" icon=""></a>
+                                        <a class="uk-dropdown-close" onclick="{ selectIcon }" icon=""><img src="@url('pages:icon.svg')" width="30" icon=""></a>
                                     </div>
                                     @foreach($app->helper("fs")->ls('*.svg', 'assets:app/media/icons') as $icon)
                                     <div>
@@ -56,16 +62,16 @@
                    <div class="uk-margin">
                        <label class="uk-text-small">@lang('Color')</label>
                        <div class="uk-margin-small-top">
-                           <field-colortag bind="singleton.color" title="@lang('Color')" size="20px"></field-colortag>
+                           <field-colortag bind="page.color" title="@lang('Color')" size="20px"></field-colortag>
                        </div>
                    </div>
 
                    <div class="uk-grid-margin">
                        <label class="uk-text-small">@lang('Description')</label>
-                       <textarea aria-label="@lang('Description')" class="uk-width-1-1 uk-form-large" name="description" bind="singleton.description" bind-event="input" rows="5"></textarea>
+                       <textarea aria-label="@lang('Description')" class="uk-width-1-1 uk-form-large" name="description" bind="page.description" bind-event="input" rows="5"></textarea>
                    </div>
 
-                   @trigger('singletons.settings.aside')
+                   @trigger('pages.settings.aside')
 
                </div>
 
@@ -76,15 +82,8 @@
                 <div class="uk-form-row">
 
                     <ul class="uk-tab uk-flex uk-margin">
-                        <li class="{ view==='fields' ? 'uk-active':'' }" data-view="fields"><a onclick="{ toggleview }">@lang('Fields')</a></li>
                         <li class="{ view==='acl' ? 'uk-active':'' }" data-view="acl"><a onclick="{ toggleview }">@lang('Permissions')</a></li>
                     </ul>
-
-                    <div class="uk-margin-large-top" show="{ view==='fields' }">
-
-                        <cp-fieldsmanager bind="singleton.fields"></cp-fieldsmanager>
-
-                    </div>
 
                     <div class="uk-margin-top" show="{ view==='acl' }">
 
@@ -99,10 +98,10 @@
                                 </div>
                                 <div class="uk-flex-item-1">
                                     <div class="uk-margin uk-text-small">
-                                        <strong class="uk-text-uppercase">@lang('Singleton')</strong>
-                                        <div class="uk-margin-top"><field-boolean bind="singleton.acl.public.form" label="@lang('Form')"></field-boolean></div>
-                                        <div class="uk-margin-top"><field-boolean bind="singleton.acl.public.edit" label="@lang('Edit Singleton')"></field-boolean></div>
-                                        <div class="uk-margin-top"><field-boolean bind="singleton.acl.public.data" label="@lang('Get Singleton Data')"></field-boolean></div>
+                                        <strong class="uk-text-uppercase">@lang('Page')</strong>
+                                        <div class="uk-margin-top"><field-boolean bind="page.acl.public.editor" label="@lang('Edit Content')"></field-boolean></div>
+                                        <div class="uk-margin-top"><field-boolean bind="page.acl.public.edit" label="@lang('Edit Params')"></field-boolean></div>
+                                        <div class="uk-margin-top"><field-boolean bind="page.acl.public.view" label="@lang('View Page')"></field-boolean></div>
                                     </div>
                                 </div>
                             </div>
@@ -120,10 +119,10 @@
                                 </div>
                                 <div class="uk-flex-item-1">
                                     <div class="uk-margin uk-text-small">
-                                        <strong class="uk-text-uppercase">@lang('Singleton')</strong>
-                                        <div class="uk-margin-top"><field-boolean bind="singleton.acl.{group}.form" label="@lang('Form')"></field-boolean></div>
-                                        <div class="uk-margin-top"><field-boolean bind="singleton.acl.{group}.edit" label="@lang('Edit Singleton')"></field-boolean></div>
-                                        <div class="uk-margin-top"><field-boolean bind="singleton.acl.{group}.data" label="@lang('Get Singleton Data')"></field-boolean></div>
+                                        <strong class="uk-text-uppercase">@lang('Page')</strong>
+                                        <div class="uk-margin-top"><field-boolean bind="page.acl.{group}.editor" label="@lang('Edit Content')"></field-boolean></div>
+                                        <div class="uk-margin-top"><field-boolean bind="page.acl.{group}.edit" label="@lang('Edit Params')"></field-boolean></div>
+                                        <div class="uk-margin-top"><field-boolean bind="page.acl.{group}.view" label="@lang('View Page')"></field-boolean></div>
                                     </div>
                                 </div>
                             </div>
@@ -142,12 +141,12 @@
 
                 <div class="uk-button-group">
                     <button class="uk-button uk-button-large uk-button-primary">@lang('Save')</button>
-                    <a class="uk-button uk-button-large" href="@route('/singletons/form')/{ singleton.name }" if="{ singleton._id }">@lang('Show form')</a>
+                    <a class="uk-button uk-button-large" href="@route('/pages/editor')/{ page.name }" if="{ page._id }">@lang('Page Editor')</a>
                 </div>
 
-                <a class="uk-button uk-button-large uk-button-link" href="@route('/singletons')">
-                    <span show="{ !singleton._id }">@lang('Cancel')</span>
-                    <span show="{ singleton._id }">@lang('Close')</span>
+                <a class="uk-button uk-button-large uk-button-link" href="@route('/pages')">
+                    <span show="{ !page._id }">@lang('Cancel')</span>
+                    <span show="{ page._id }">@lang('Close')</span>
                 </a>
             </div>
         </cp-actionbar>
@@ -159,17 +158,17 @@
 
         this.mixin(RiotBindMixin);
 
-        this.view = 'fields';
+        this.view = 'acl';
 
-        this.singleton = {{ json_encode($singleton) }};
+        this.page = {{ json_encode($page) }};
         this.aclgroups  = {{ json_encode($aclgroups) }};
 
-        if (!this.singleton.acl) {
-            this.singleton.acl = {};
+        if (!this.page.acl) {
+            this.page.acl = {};
         }
 
-        if (Array.isArray(this.singleton.acl)) {
-            this.singleton.acl = {};
+        if (Array.isArray(this.page.acl)) {
+            this.page.acl = {};
         }
 
         this.on('mount', function(){
@@ -190,8 +189,8 @@
 
             // lock resource
             var idle = setInterval(function() {
-                if (!$this.singleton._id) return;
-                Maya.lockResource($this.singleton._id);
+                if (!$this.page._id) return;
+                Maya.lockResource($this.page._id);
                 clearInterval(idle);
             }, 60000);
         });
@@ -199,27 +198,28 @@
         this.on('update', function(){
 
             // lock name if saved
-            if (this.singleton._id) {
+            if (this.page._id) {
                 this.refs.name.disabled = true;
+                // this.refs.url.disabled = true;
             }
         });
 
         selectIcon(e) {
-            this.singleton.icon = e.target.getAttribute('icon');
+            this.page.icon = e.target.getAttribute('icon');
         }
 
         submit(e) {
 
             if(e) e.preventDefault();
 
-            var singleton = this.singleton;
+            var page = this.page;
 
-            App.callmodule('singletons:saveSingleton', [this.singleton.name, singleton]).then(function(data) {
+            App.callmodule('pages:savePage', [this.page.name, page]).then(function(data) {
 
                 if (data.result) {
 
                     App.ui.notify("Saving successful", "success");
-                    $this.singleton = data.result;
+                    $this.page = data.result;
                     $this.update();
 
                 } else {

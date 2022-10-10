@@ -1,0 +1,227 @@
+:root {
+  --editor-sidevav-width: 0%;
+  --editor-pn-views: 17%;
+}
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+html {
+  overflow: scroll;
+  overflow-x: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+body {
+  padding: 0;
+}
+.uk-sticky-placeholder {
+  margin-bottom: 0 !important;
+}
+.app-main {
+  height: calc(100vh - 65px);
+  padding: 0;
+  margin: 0;
+}
+.app-main .uk-container.uk-container-center {
+  height: 100%;
+  max-height: 100%;
+  min-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+  padding: 0;
+  margin: 0;
+}
+div#gjs, .no-page {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+
+.sidenav {
+  position: fixed;
+  top: 65;
+  left: 0;
+  width: var(--editor-sidevav-width, 15%);
+  height: 100%;
+  overflow: scroll;
+  overflow-x: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  background-color: rgba(255, 255, 255, 0.95);
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  -webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+          box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.sidenav .logo {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.sidenav .pages {
+  height: 100%;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+.sidenav .pages li{
+  height: 30px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-self: center;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0 10px !important;
+}
+.sidenav .pages li a{
+  padding: 5px;
+}
+.sidenav .pages li .tools{
+  display: none;
+}
+.sidenav .pages li:hover .tools{
+  display: inline;
+}
+
+.main-content {
+  /*position: relative; */
+  width: calc(100% - var(--editor-sidevav-width, 15%));
+  /* left: var(--editor-sidevav-width, 15%); */
+  margin-left: var(--editor-sidevav-width, 15%);
+  height: 100%;
+}
+#gjs-breadcrumbs{
+  font-size: 8px;
+  left: calc(var(--editor-sidevav-width, 15%) + 4px);
+  bottom: 2px;
+}
+#gjs-breadcrumbs li a{
+  padding-left: 0;
+  height: 14px;
+  line-height: 14px;
+  margin-right: 12px;
+}
+#gjs-breadcrumbs li a::before,#gjs-breadcrumbs li a:after {
+  border-width: 7px 5px;
+}
+#gjs-breadcrumbs li a:before {
+  left: -10px;
+}
+.main-content .navbar {
+  padding: 0;
+}
+
+.main-content .navbar .container-fluid {
+  padding: 0;
+}
+
+.main-content #editor {
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  height: 100% !important;
+}
+.gjs-cv-canvas, .gjs-pn-commands{
+  width: calc(100% - var(--editor-pn-views,15%));
+}
+.gjs-pn-options {
+  right: var(--editor-pn-views,15%);
+}
+.gjs-pn-panel.gjs-pn-views, .gjs-pn-panel.gjs-pn-views-container {
+  width: var(--editor-pn-views,15%);
+}
+
+[editor-content]{
+  height: 100%;
+  width: 100%;
+}
+[editor-content] .loading{
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+/* .gjs-pn-panel{
+  height: 47px;
+} */
+/* 
+.nav {
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.gjs-pn-panel {
+  position: relative;
+}
+
+.gjs-cv-canvas {
+  width: 100%;
+  height: 100%;
+  top: 0;
+}
+
+.tab-content {
+  display: contents;
+}
+
+#block {
+  height: 100%;
+}
+
+#block #blocks {
+  height: 100%;
+}
+
+#block #blocks .gjs-blocks-c {
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+#block #blocks .gjs-block {
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+#block #blocks .gjs-block-label {
+  display: none;
+}
+
+/* Theming */
+.gjs-one-bg {
+  background-color: #fff;
+}
+
+.gjs-two-color {
+  color: #444444;
+}
+
+.gjs-three-bg {
+  background-color: #1e8fe1;
+  color: white;
+}
+
+.gjs-four-color,
+.gjs-four-color-h:hover {
+  color: #1e8fe1;
+}
+/*# sourceMappingURL=main.css.map */

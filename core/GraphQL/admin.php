@@ -15,10 +15,12 @@ $app->on('admin.init', function() {
     // bind admin routes /singleton/*
     $this->bindClass('GraphQL\\Controller\\Admin', 'graphql');
     if ($this->module('maya')->hasaccess('maya', 'rest')) {
-        $this->on('maya.menu.system', function() {
-            $this->renderView("graphql:views/partials/menu.php");
-        });
         $active = strpos($this['route'], '/graphql/playground') === 0;
+        $this->on('maya.menu.system', function() use ($active){
+            $this->renderView("graphql:views/partials/menu.php",[
+               "active" => $active 
+            ]);
+        });
         
         // add to modules menu
         $this->helper('admin')->addMenuItem('modules', [

@@ -319,4 +319,8 @@ class RestApi extends \LimeExtra\Controller {
 
         return $extended ? $collections : \array_keys($collections);
     }
+
+    public function index($extended = false) {
+        return $this->listPages($extended) or [];
+    }
 }

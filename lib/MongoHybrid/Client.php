@@ -66,6 +66,21 @@ class Client {
     }
 
     /**
+     * Get value for specific key
+     *
+     * @param  string $collection
+     * @param  string $key
+     * @param  mixed $default
+     * @return mixed
+     */
+    public function getKeys($collection) {
+
+        $entry = $this->driver->find($collection);
+
+        return $entry->toArray();
+    }
+
+    /**
      * Set value for specific key
      *
      * @param  string $collection

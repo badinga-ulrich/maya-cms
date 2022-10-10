@@ -59,15 +59,26 @@ class RestApi extends \LimeExtra\Controller {
     }
 
     public function listSingletons($extended = false) {
-
-        $user = $this->module('maya')->getUser();
-
-        if ($user) {
-            $singletons = $this->module('singletons')->getSingletonsInGroup($user['group']);
-        } else {
-            $singletons = $this->module('singletons')->singletons();
+        try {
+            //code...
+            $user = $this->module('maya')->getUser();
+            
+            if ($user) {
+                $singletons = $this->module('singletons')->getSingletonsInGroup($user['group']);
+            } else {
+                $singletons = $this->module('singletons')->singletons();
+            }
+            $has = \count(\array_keys($singletons));
+            if($has)
+            return $extended ? $singletons : \array_keys($singletons);
+            return "LOVE";
+        } catch (\Throwable $th) {
+            //throw $th;
+            return  "TROP COOL";
         }
+    }
 
-        return $extended ? $singletons : \array_keys($singletons);
+    public function index($extended = false) {
+        return $this->listPages($extended);
     }
 }

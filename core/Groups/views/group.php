@@ -59,6 +59,7 @@ use Maya\Controller\Groups;
                                     </div>
                                     @endforeach
                                 @endif
+                                @trigger('maya.groups.settings.vars', [&$group])
                             </div>
                             <hr style="clear:both" class="uk-margin-small-top" />
                         </div>
@@ -128,13 +129,13 @@ use Maya\Controller\Groups;
         <h3>@lang('Group Access')</h3>
 
         <div class="uk-form-row">
-            <strong class="uk-text-uppercase">Generic</strong>
+            <strong class="uk-text-uppercase">@lang('Generic')</strong>
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.admin" label="@lang('Admin')"></field-boolean>
             </div>
         </div>
         <div class="uk-form-row">
-            <strong class="uk-text-uppercase">maya</strong>
+            <strong class="uk-text-uppercase">@lang('Maya')</strong>
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.maya.backend" label="@lang('Backend')"></field-boolean>
             </div>
@@ -159,9 +160,10 @@ use Maya\Controller\Groups;
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.maya.info" label="@lang('SysInfo')"></field-boolean>
             </div>
+            @trigger('maya.groups.settings.maya', [&$group])
         </div>
         <div class="uk-form-row">
-            <strong class="uk-text-uppercase">collections <small>(global)</small></strong>
+            <strong class="uk-text-uppercase">@lang('Collections') <small>(global)</small></strong>
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.collections.create" label="@lang('Create')"></field-boolean>
             </div>
@@ -171,9 +173,10 @@ use Maya\Controller\Groups;
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.collections.manage" label="@lang('Manage')"></field-boolean>
             </div>
+            @trigger('maya.groups.settings.collections', [&$group])
         </div>
         <div class="uk-form-row">
-            <strong class="uk-text-uppercase">singletons <small>(global)</small></strong>
+            <strong class="uk-text-uppercase">@lang('Singletons') <small>(global)</small></strong>
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.singletons.create" label="@lang('Create')"></field-boolean>
             </div>
@@ -183,9 +186,10 @@ use Maya\Controller\Groups;
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.singletons.manage" label="@lang('Manage')"></field-boolean>
             </div>
+            @trigger('maya.groups.settings.singletons', [&$group])
         </div>
         <div class="uk-form-row">
-            <strong class="uk-text-uppercase">forms <small>(global)</small></strong>
+            <strong class="uk-text-uppercase">@lang('Forms') <small>(global)</small></strong>
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.forms.create" label="@lang('Create')"></field-boolean>
             </div>
@@ -195,11 +199,12 @@ use Maya\Controller\Groups;
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.forms.manage" label="@lang('Manage')"></field-boolean>
             </div>
+            @trigger('maya.groups.settings.forms', [&$group])
         </div>
-        
+        @trigger('maya.groups.settings.generic', [&$group])
         <div class="uk-form-row">
             <small style="color: #ccc">
-                Remember that in most cases its not necessary to grant global permissions to groups on collections etc. Instead of granting global permissions, better grant access to groups per collection ACL.
+                @lang('Remember that in most cases its not necessary to grant global permissions to groups on collections etc. Instead of granting global permissions, better grant access to groups per collection ACL.')
             </small>
         </div>
 
@@ -291,7 +296,7 @@ use Maya\Controller\Groups;
            if(this.alsoCreateUser) {
                 var account = {
                     "user":this.group.group,
-                    "email":this.group.group+"@DUMMY.de",
+                    "email":this.group.group+"@maya.cms",
                     "active":true,
                     "group":this.group.group,
                     "i18n":"en",

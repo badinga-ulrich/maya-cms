@@ -8,22 +8,22 @@
 <script>
   window.__allowedFields = {{ json_encode($allowedFields) }};
   window.__revisions = {{ json_encode($revisions) }};
-  window.__singleton = {{ json_encode($singleton) }};
-  window.__singletonData = {{ json_encode($data) }};
+  window.__page = {{ json_encode($page) }};
+  window.__pageData = {{ json_encode($data) }};
 
 </script>
 
 <div>
     <ul class="uk-breadcrumb">
-        <li><a href="@route('/singletons')">@lang('Singletons')</a></li>
+        <li><a href="@route('/pages')">@lang('Pages')</a></li>
         <li data-uk-dropdown="mode:'hover', delay:300">
-            <a href="@route('/singletons/form/'.$singleton['name'])"><i class="uk-icon-bars"></i> {{ htmlspecialchars(@$singleton['label'] ? $singleton['label']:$singleton['name'], ENT_QUOTES, 'UTF-8') }}</a>
+            <a href="@route('/pages/form/'.$page['name'])"><i class="uk-icon-bars"></i> {{ htmlspecialchars(@$page['label'] ? $page['label']:$page['name'], ENT_QUOTES, 'UTF-8') }}</a>
 
-            @if($app->module('singletons')->hasaccess($singleton['name'], 'edit'))
+            @if($app->module('pages')->hasaccess($page['name'], 'edit'))
             <div class="uk-dropdown">
                 <ul class="uk-nav uk-nav-dropdown">
                     <li class="uk-nav-header">@lang('Actions')</li>
-                    <li><a href="@route('/singletons/singleton/'.$singleton['name'])">@lang('Edit')</a></li>
+                    <li><a href="@route('/pages/page/'.$page['name'])">@lang('Edit')</a></li>
                 </ul>
             </div>
             @endif
@@ -40,7 +40,7 @@
             <img class="uk-svg-adjust" src="@url('assets:app/media/icons/revisions.svg')" width="150" alt="icon" data-uk-svg>
             <div class="uk-h2 uk-margin">@lang('No revisions available')</div>
             <div class="uk-margin-large">
-                <a class="uk-button uk-button-large uk-button-link" href="@route("/singletons/form/{$singleton['name']}")">@lang('Back to singleton')</a>
+                <a class="uk-button uk-button-large uk-button-link" href="@route("/pages/form/{$page['name']}")">@lang('Back to page')</a>
             </div>
         </div>
     </div>
@@ -69,7 +69,7 @@
                                 @lang('Restore to this version')
                             </button>
 
-                            <a class="uk-margin-left uk-button uk-button-large uk-button-link" href="@route("/singletons/form/{$singleton['name']}")">@lang('Back to singleton')</a>
+                            <a class="uk-margin-left uk-button uk-button-large uk-button-link" href="@route("/pages/form/{$page['name']}")">@lang('Back to page')</a>
                         </div>
                     </div>
                 </div>
@@ -147,9 +147,9 @@
         var $this = this;
 
         this.allowedFields = window.__allowedFields;
-        this.singleton  = window.__singleton;
+        this.page  = window.__page;
         this.revisions  = window.__revisions;
-        this.current    = window.__singletonData;
+        this.current    = window.__pageData;
 
         this.showOnlyChanged = true;
 
@@ -230,7 +230,7 @@
 
         save(message) {
 
-            App.request('/singletons/update_data/'+this.singleton.name, {data:this.current}).then(function(entry) {
+            App.request('/pages/update_data/'+this.page.name, {data:this.current}).then(function(entry) {
 
                 if (entry) {
                     App.ui.notify(message, "success");

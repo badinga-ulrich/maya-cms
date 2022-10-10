@@ -1,13 +1,13 @@
 
 <style>
-    @if($singleton['color'])
-    .app-header { border-top: 8px {{ $singleton['color'] }} solid; }
+    @if($page['color'])
+    .app-header { border-top: 8px {{ $page['color'] }} solid; }
     @endif
 </style>
 
 <script>
-    window.__singletonData = {{ json_encode($data) }} || {};
-    window.__singleton = {{ json_encode($singleton) }} || {};
+    window.__pageData = {{ json_encode($data) }} || {};
+    window.__page = {{ json_encode($page) }} || {};
 </script>
 
 <div riot-view>
@@ -16,16 +16,16 @@
 
         <div class="uk-container uk-container-center">
             <ul class="uk-breadcrumb">
-                <li><a href="@route('/singletons')">@lang('Singletons')</a></li>
+                <li><a href="@route('/pages')">@lang('Pages')</a></li>
                 <li class="uk-active" data-uk-dropdown>
 
-                    <a><i class="uk-icon-bars"></i> {{ htmlspecialchars(@$singleton['label'] ? $singleton['label']:$singleton['name'], ENT_QUOTES, 'UTF-8') }}</a>
+                    <a><i class="uk-icon-bars"></i> {{ htmlspecialchars(@$page['label'] ? $page['label']:$page['name'], ENT_QUOTES, 'UTF-8') }}</a>
 
-                    @if($app->module('singletons')->hasaccess($singleton['name'], 'edit'))
+                    @if($app->module('pages')->hasaccess($page['name'], 'edit'))
                     <div class="uk-dropdown">
                         <ul class="uk-nav uk-nav-dropdown">
                             <li class="uk-nav-header">@lang('Actions')</li>
-                            <li><a href="@route('/singletons/singleton/'.$singleton['name'])">@lang('Edit')</a></li>
+                            <li><a href="@route('/pages/page/'.$page['name'])">@lang('Edit')</a></li>
                         </ul>
                     </div>
                     @endif
@@ -35,9 +35,9 @@
 
             <div class="uk-h3 uk-flex uk-flex-middle uk-text-bold">
                 <div class="uk-margin-small-right">
-                    <img src="@url($singleton['icon'] ? 'assets:app/media/icons/'.$singleton['icon']:'singletons:icon.svg')" width="40" alt="icon">
+                    <img src="@url($page['icon'] ? 'assets:app/media/icons/'.$page['icon']:'pages:icon.svg')" width="40" alt="icon">
                 </div>
-                <div class="uk-flex-item-1">{ singleton.label || singleton.name }</div>
+                <div class="uk-flex-item-1">{ page.label || page.name }</div>
             </div>
         </div>
 
@@ -65,12 +65,12 @@
     <div class="uk-margin-top">
 
         <div class="uk-alert" if="{ !fields.length }">
-            @lang('No fields defined'). <a href="@route('/singletons/singleton')/{ singleton.name }">@lang('Define singleton fields').</a>
+            @lang('No fields defined'). <a href="@route('/pages/page')/{ page.name }">@lang('Define page fields').</a>
         </div>
 
-        @if($singleton['description'])
+        @if($page['description'])
         <div class="uk-margin uk-text-muted">
-            {{ htmlspecialchars($singleton['description'], ENT_QUOTES, 'UTF-8') }}
+            {{ htmlspecialchars($page['description'], ENT_QUOTES, 'UTF-8') }}
         </div>
         @endif
 
@@ -120,7 +120,7 @@
                     <cp-actionbar>
                         <div class="uk-container uk-container-center">
                             <button class="uk-button uk-button-large uk-button-primary">@lang('Save')</button>
-                            <a class="uk-button uk-button-link" href="@route('/singletons')">@lang('Close')</a>
+                            <a class="uk-button uk-button-link" href="@route('/pages')">@lang('Close')</a>
                         </div>
                     </cp-actionbar>
 
@@ -151,15 +151,15 @@
 
                 <div class="uk-margin">
                     <label class="uk-text-small">@lang('Last Modified')</label>
-                    <div class="uk-margin-small-top uk-text-muted"><i class="uk-icon-calendar uk-margin-small-right"></i> {  App.Utils.dateformat( new Date( 1000 * singleton._modified )) }</div>
+                    <div class="uk-margin-small-top uk-text-muted"><i class="uk-icon-calendar uk-margin-small-right"></i> {  App.Utils.dateformat( new Date( 1000 * page._modified )) }</div>
                 </div>
 
                 <div class="uk-margin">
                     <label class="uk-text-small">@lang('Revisions')</label>
                     <div class="uk-margin-small-top">
                         <span class="uk-position-relative">
-                            <cp-revisions-info class="uk-badge uk-text-large" rid="{singleton._id}"></cp-revisions-info>
-                            <a class="uk-position-cover" href="@route('/singletons/revisions/'.$singleton['name'])/{singleton._id}"></a>
+                            <cp-revisions-info class="uk-badge uk-text-large" rid="{page._id}"></cp-revisions-info>
+                            <a class="uk-position-cover" href="@route('/pages/revisions/'.$page['name'])/{page._id}"></a>
                         </span>
                     </div>
                 </div>
@@ -171,7 +171,7 @@
                     </div>
                 </div>
 
-                @trigger('singletons.form.aside', [$singleton['name']])
+                @trigger('pages.form.aside', [$page['name']])
 
             </div>
 
@@ -187,11 +187,11 @@
 
             this.mixin(RiotBindMixin);
 
-            this.singleton = window.__singleton;
-            this.fields    = this.singleton.fields;
+            this.page = window.__page;
+            this.fields    = this.page.fields;
             this.fieldsidx = {};
 
-            this.data      = window.__singletonData;
+            this.data      = window.__pageData;
 
             this.languages = App.$data.languages;
             this.groups    = {main:[]};
@@ -242,7 +242,7 @@
             }
 
             if (this.languages.length) {
-                this.lang = App.Utils.params('lang') || App.session.get('singletons.form.'+this.singleton._id+'.lang', '');
+                this.lang = App.Utils.params('lang') || App.session.get('pages.form.'+this.page._id+'.lang', '');
                 if (!this.languages.find(function(el){return el.code == $this.lang;})) this.lang = '';
             }
 
@@ -265,7 +265,7 @@
                 });
 
                 // lock resource
-                Maya.lockResource('singleton_'+$this.singleton.name, function(e){
+                Maya.lockResource('page_'+$this.page.name, function(e){
                     window.location.reload();
                 });
             });
@@ -305,7 +305,7 @@
                     return;
                 }
 
-                App.request('/singletons/update_data/'+this.singleton.name, {data:this.data}).then(function(res) {
+                App.request('/pages/update_data/'+this.page.name, {data:this.data}).then(function(res) {
 
                     if (res) {
 
@@ -380,7 +380,7 @@
             }
 
             persistLanguage(e) {
-                App.session.set('singletons.form.'+this.singleton._id+'.lang', e.target.value);
+                App.session.set('pages.form.'+this.page._id+'.lang', e.target.value);
             }
 
             showDataObject() {
