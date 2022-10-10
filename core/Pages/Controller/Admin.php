@@ -53,20 +53,29 @@ class Admin extends \Maya\AuthController {
         }
 
         $page = [ 'name'=>'', 'description' => '', 'fields'=>[], 'data' => null];
-
+        $clone = false;
+        if(isset($_REQUEST["from"]) && !$name){
+            $name = $_REQUEST["from"];
+            $clone = true;
+        }
         if ($name) {
 
             $page = $this->module('pages')->page($name);
+            if(!$clone){
+                if (!$page) {
+                    return false;
+                }
 
-            if (!$page) {
-                return false;
+                if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($page['_id'], $meta)) {
+                    return $this->render('maya:views/base/locked.php', compact('meta'));
+                }
+
+                $this->app->helper('admin')->lockResourceId($page['_id']);
+            }else{
+                unset($page['_id']);
+                // unset($page['url']);
+                unset($page['name']);
             }
-
-            if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($page['_id'], $meta)) {
-                return $this->render('maya:views/base/locked.php', compact('meta'));
-            }
-
-            $this->app->helper('admin')->lockResourceId($page['_id']);
         }
 
         // acl groups
@@ -196,6 +205,7 @@ class Admin extends \Maya\AuthController {
         $languages = $this->app->retrieve('config/languages', []);
 
         $allowedFields = [];
+        $user = $this->module('maya')->getUser();
 
         foreach ($page['fields'] as $field) {
 

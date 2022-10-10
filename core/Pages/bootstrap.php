@@ -491,7 +491,7 @@ $app->on('maya.bootstrap', function() use($app) {
                         "<title>",$page['label'],"</title>",
                         "<style>",$data["css"] ?? "","</style>",
                       "</head>",
-                      $data["html"] ?? "",
+                      "<body>",$data["html"] ?? "","</body>",
                       "<script>",$data["js"] ?? "","</script>",
                     "</html>"]);
             });

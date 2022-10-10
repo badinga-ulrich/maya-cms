@@ -8,6 +8,9 @@
         position: relative;
         top: 6px;
     }
+    .show-link-home{
+        background: #673ab7;
+    }
     .show-link span, .show-link span i{
         color : white !important;
     }
@@ -93,6 +96,9 @@
                                     <li><a href="@route('/pages/editor')/{ page.name }">@lang('Page Editor')</a></li>
                                     <li if="{ page.meta.allowed.page_edit }" class="uk-nav-divider"></li>
                                     <li if="{ page.meta.allowed.page_edit }"><a href="@route('/pages/page')/{ page.name }">@lang('Edit')</a></li>
+                                    @hasaccess?('pages', 'create')
+                                    <li><a  class="uk-dropdown-close" href="@route('/pages/page')?from={ page.name }">@lang('Clone')</a></li>
+                                    @end
                                     @hasaccess?('pages', 'delete')
                                     <li class="uk-nav-item-danger"><a class="uk-dropdown-close" onclick="{ this.parent.remove }">@lang('Delete')</a></li>
                                     @end
@@ -105,14 +111,16 @@
                         <div>&nbsp;</div>
 
                     </div>
-                    <div class="uk-flex-item-1 uk-text-center uk-text-truncate show-link">
-                            <span show="{page.meta.url != '/'}" target="_blank" class="uk-text-bold uk-link-muted" title="{ page.meta.url }">
-                                <i class="uk-icon-link"></i> { page.meta.url }
-                            </span>
-                            <span show="{page.meta.url == '/'}" target="_blank" class="uk-text-bold uk-link-muted" title="Home page">
-                                <i class="uk-icon-home"></i>
-                            </span>
-                        </div>
+                    <div  show="{page.meta.url != '/'}" class="uk-flex-item-1 uk-text-center uk-text-truncate show-link">
+                        <span target="_blank" class="uk-text-bold uk-link-muted" title="{ page.meta.url }">
+                            <i class="uk-icon-link"></i> { page.meta.url }
+                        </span>
+                    </div>
+                    <div  show="{page.meta.url == '/'}" class="uk-flex-item-1 uk-text-center uk-text-truncate show-link show-link-home">
+                        <span target="_blank" class="uk-text-bold uk-link-muted" title="Home page">
+                            <i class="uk-icon-home"></i>
+                        </span>
+                    </div>
 
                 </div>
 

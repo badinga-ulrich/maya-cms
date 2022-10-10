@@ -34,7 +34,7 @@
                    </div>
                    <div class="uk-margin">
                        <label class="uk-text-small">@lang('Url')</label>
-                       <input aria-label="@lang('Url')" class="uk-width-1-1 uk-form-large" type="text" ref="url" bind="page.url" pattern="/[a-zA-Z0-9_]?(/[a-zA-Z0-9_]+)*" required>
+                       <input aria-label="@lang('Url')" class="uk-width-1-1 uk-form-large" type="text" ref="url" bind="page.url" pattern="/([a-zA-Z0-9_]+)?(/[a-zA-Z0-9_]+)*" required>
                        <p class="uk-text-small uk-text-muted" if="{!page._id}">
                            @lang('Ex. /page, /url/to/page')
                        </p>
