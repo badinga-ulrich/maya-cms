@@ -23,7 +23,7 @@
                 <ul class="uk-list uk-list-space uk-margin-top">
                     @foreach(array_slice($pages, 0, count($pages) > 5 ? 5: count($pages)) as $page)
                     <li class="uk-text-truncate">
-                        <a class="uk-link-muted" href="@route('/pages/form/'.$page['name'])">
+                        <a class="uk-link-muted" href="@route('/pages/editor/'.$page['name'])">
 
                             <img class="uk-margin-small-right uk-svg-adjust" src="@url(isset($page['icon']) && $page['icon'] ? 'assets:app/media/icons/'.$page['icon']:'pages:icon.svg')" width="18px" alt="icon" data-uk-svg>
 

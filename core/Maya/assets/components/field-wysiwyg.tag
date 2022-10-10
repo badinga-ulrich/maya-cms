@@ -65,7 +65,7 @@
 
                         tinymce.init(App.$.extend(true, {
                             language: lang,
-                            language_url : lang == 'en' ? '' : PUBLIC_STORAGE_URL + '/assets/maya/i18n/tinymce/'+lang+'.js',
+                            language_url : lang == 'en' ? '' : PUBLIC_STORAGE_URL + '/assets/maya/i18n/tinymce/langs/'+lang+'.js',
                             branding: false,
                             resize: true,
                             height: 350,

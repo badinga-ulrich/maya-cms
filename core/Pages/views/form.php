@@ -124,7 +124,7 @@
                         </div>
                     </cp-actionbar>
 
-                </form>
+                </editor>
             </div>
 
             <div class="uk-grid-margin uk-width-medium-1-4 uk-flex-order-first uk-flex-order-last-medium">

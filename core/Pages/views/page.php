@@ -150,7 +150,7 @@
                 </a>
             </div>
         </cp-actionbar>
-    </form>
+    </editor>
 
     <script type="view/script">
 
