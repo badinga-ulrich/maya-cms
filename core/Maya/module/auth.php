@@ -77,7 +77,7 @@ $this->module('maya')->extend([
         $app('session')->delete('maya.app.auth');
 
         // prevent session fixation attacks
-        session_regenerate_id(true);
+        @session_regenerate_id(true);
     },
 
     'hasaccess' => function($resource, $action, $group = null) use($app) {

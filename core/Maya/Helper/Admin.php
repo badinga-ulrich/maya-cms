@@ -277,4 +277,14 @@ class Admin extends \Lime\Helper {
 
         return '';
     }
+    public function addDashboardWidget($name,$content,$side ="main") {
+        $this->app->on('admin.dashboard.widgets', function($widgets) use($name, $content, $side) {
+            $widgets[] = [
+                'name'    => $name,
+                'content' => $content,
+                'area'    => $side == 'left' ? "aside-left" : ($side == 'right' ? "aside-right" : 'main')
+            ];
+        
+        });
+    }
 }

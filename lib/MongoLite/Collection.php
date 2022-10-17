@@ -176,9 +176,10 @@ class Collection {
      */
     public function remove($criteria) {
 
-        $sql = 'DELETE FROM `'.$this->name.'` WHERE document_criteria("'.$this->database->registerCriteriaFunction($criteria).'", document)';
-
-        return $this->database->connection->exec($sql);
+        $sql = 'DELETE FROM `'.$this->name.'` WHERE document_criteria("'.$this->database->registerCriteriaFunction($criteria).'", document);';
+        // var_dump("SQL == $sql", $this->database);exit;
+        $ret =  $this->database->connection->exec($sql);        
+        return $ret;
     }
 
     /**

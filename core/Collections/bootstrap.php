@@ -79,7 +79,7 @@ $this->module('collections')->extend([
         return $collection;
     },
 
-    'saveCollection' => function($name, $data, $rules = null) {
+    'saveCollection' => function($name, $data, $rules = null, $views=null) {
 
         if (!trim($name)) {
             return false;
@@ -105,6 +105,22 @@ $this->module('collections')->extend([
                 }
             }
         }
+        if ($views) {
+            $phpViews = ['bootstrap'];
+            foreach (['item','bootstrap'] as $method) {
+                if (isset($views[$method])) {
+                    $code = trim($views[$method]);
+                    if (array_search($method,$phpViews) !== false && $code == '<?php') {
+                        $code .= "\n\n";
+                    }
+
+                    if (array_search($method,$phpViews) !== false && strpos($code, '<?php')!==0) {
+                        $code = "<?php\n\n{$code}";
+                    }
+                    $this->app->helper('fs')->write("#storage:collections/views/{$name}.{$method}.php", $code);
+                }
+            }
+        }
 
         return isset($data['_id']) ? $this->updateCollection($name, $data) : $this->createCollection($name, $data);
     },
@@ -118,6 +134,10 @@ $this->module('collections')->extend([
             // remove rules
             foreach (['create', 'read', 'update', 'delete'] as $method) {
                 $this->app->helper('fs')->delete("#storage:collections/rules/{$name}.{$method}.php");
+            }
+            // remove views
+            foreach (['item','bootstrap'] as $method) {
+                $this->app->helper('fs')->delete("#storage:collections/views/{$name}.{$method}.php");
             }
 
             $this->app->storage->dropCollection("collections/{$collection['_id']}");
@@ -158,6 +178,16 @@ $this->module('collections')->extend([
 
             foreach (['create', 'read', 'update', 'delete'] as $method) {
                 $this->app->helper('fs')->rename("{$rulesPath}/{$name}.{$method}.php", "{$rulesPath}/{$to}.{$method}.php");
+            }
+        }
+
+        // rename views
+        if ($this->app->path('#storage:collections/views')) {
+
+            $viewsPath = $this->app->path('#storage:collections/views');
+
+            foreach (['item'] as $method) {
+                $this->app->helper('fs')->rename("{$viewsPath}/{$name}.{$method}.php", "{$viewsPath}/{$to}.{$method}.php");
             }
         }
 
@@ -383,7 +413,6 @@ $this->module('collections')->extend([
             if (!$isUpdate) {
                 $entry['_created'] = $entry['_modified'];
             }
-
             // check rule
             $context = _check_collection_rule($_collection, $isUpdate ? 'update':'create', [
                 'options' => $options,
@@ -672,12 +701,12 @@ function _check_collection_rule($collection, $rule, $_context = null) {
             try {
                 $ret = include($_rulefile);
             } catch(\Throwable $e) {
-
                 if (maya()->retrieve('config/debug')) {
                     echo $e;
                 }
+                maya()->stop(["error"=>"$e"], 412);
             }
-
+            
             if (!is_null($ret) && is_numeric($ret) && $ret >= 400) {
                 maya()->stop($ret);
             }

@@ -21,7 +21,6 @@ if(MAYA_API_REQUEST){
     // send SSE Event
     $app->bind('/api/sample/:from/:to', function($params) {
         $f = [$params["from"], $params["to"]];
-        sort($f);
         $this->module("maya")->publish(
             $params["from"]."::".$params["to"], 
             $_REQUEST["message"],

@@ -166,7 +166,6 @@ $this->module('maya')->extend([
 
             $data = include($container);
             $data = @unserialize($this->app->decode($data, $this->app['sec-key']));
-
             if ($data !== false) {
                 $keys = array_merge($keys, $data);
             }

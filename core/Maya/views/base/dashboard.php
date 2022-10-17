@@ -79,7 +79,7 @@
             <div class="uk-sortable uk-grid uk-grid-gutter uk-grid-width-1-1" data-uk-sortable="{group:'dashboard',animation:false}">
                 @foreach($areas['main'] as $widget)
                 <div data-widget="{{ $widget['name'] }}">
-                    {{ $widget['content'] }}
+                    {{ is_callable($widget['content']) ? call_user_func($widget['content']) : $widget['content'] }}
                 </div>
                 @endforeach
             </div>
@@ -88,7 +88,7 @@
             <div class="uk-sortable uk-grid uk-grid-gutter uk-grid-width-medium-1-1" data-uk-sortable="{group:'dashboard',animation:false}">
                 @foreach($areas['aside-left'] as $widget)
                 <div data-widget="{{ $widget['name'] }}">
-                    {{ $widget['content'] }}
+                    {{ is_callable($widget['content']) ? call_user_func($widget['content']) : $widget['content'] }}
                 </div>
                 @endforeach
             </div>
@@ -97,7 +97,7 @@
             <div class="uk-sortable uk-grid uk-grid-gutter uk-grid-width-medium-1-1" data-uk-sortable="{group:'dashboard',animation:false}">
                 @foreach($areas['aside-right'] as $widget)
                 <div data-widget="{{ $widget['name'] }}">
-                    {{ $widget['content'] }}
+                    {{ is_callable($widget['content']) ? call_user_func($widget['content']) : $widget['content'] }}
                 </div>
                 @endforeach
             </div>

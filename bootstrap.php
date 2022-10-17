@@ -86,7 +86,15 @@ function maya($module = null) {
     static $app;
 
     if (!$app) {
-
+        $secKey =  uniqid();
+        $secKeyFile =  MAYA_STORAGE_FOLDER."/sec-key";
+        if(is_file($secKeyFile) && is_readable($secKeyFile)){
+            $secKey = file_get_contents($secKeyFile);
+        }else if(is_writable(MAYA_STORAGE_FOLDER) && is_file($secKey) ){
+            file_put_contents($secKeyFile, $secKey);
+        }else{
+            $secKey = 'c3b40c4c-db44-s5h7-a814-b4931a15e5e1';
+        };
         $customConfig = [];
 
         // load custom config
@@ -104,7 +112,7 @@ function maya($module = null) {
             'docs_root'    => MAYA_DOCS_ROOT,
             'session.name' => md5(MAYA_ENV_ROOT),
             'session.init' => (MAYA_ADMIN && !MAYA_API_REQUEST) ? true : false,
-            'sec-key'      => 'c3b40c4c-db44-s5h7-a814-b4931a15e5e1',
+            'sec-key'      => $secKey,
             'i18n'         => 'en',
             'database'     => ['server' => 'mongolite://'.(MAYA_STORAGE_FOLDER.'/data'), 'options' => ['db' => 'mayadb'], 'driverOptions' => [] ],
             'memory'       => ['server' => 'redislite://'.(MAYA_STORAGE_FOLDER.'/data/maya.memory.sqlite'), 'options' => [] ],
@@ -309,7 +317,6 @@ function maya($module = null) {
 
     return $module ? $app->module($module) : $app;
 }
-
 $maya = maya();
 $GLOBALS["maya"] = $maya;
 

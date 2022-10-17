@@ -16,7 +16,7 @@
     </style>
 
     <div class="uk-position-relative field-text-container">
-        <input ref="input" class="uk-width-1-1" bind="{opts.bind}" type="{ opts.type || 'text' }" oninput="{updateLengthIndicator}" placeholder="{ opts.placeholder }">
+        <input ref="input" class="uk-width-1-1" bind="{opts.bind}" type="{ opts.type || 'text' }" oninput="{updateLengthIndicator}" placeholder="{ opts.placeholder }"  readonly="{ opts.readonly }">
         <span class="uk-text-muted" ref="lengthIndicator" show="{type=='text'}" hide="{opts.showCount === false}"></span>
     </div>
 

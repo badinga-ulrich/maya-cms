@@ -17,80 +17,111 @@ require_once(__DIR__.'/../lib/StopSSEException.php');
 use Hhxsv5\SSE\Event;
 use Hhxsv5\SSE\SSE;
 use Hhxsv5\SSE\StopSSEException;
-define("SSE_MAX_EXECUTION_TIME",time()+6000);
+define("SSE_MAX_EXECUTION_TIME",time()+(6000 * 5)); // max 5h
 class RestApi extends \LimeExtra\Controller {
     static $TTL = 0;
     static $ids = [];
-    private function _events($chanel="events",$names=[]) {
+    /**
+     * @param Array<String>|String $names
+     * @param String $chanel
+     * 
+     * @return void
+     */
+    private function _events( $names,$chanel="events") {
+        /**
+         * @var Array<String>
+         */
+        if(empty($names)){
+            $names = [];
+        }
+        $namesArray = is_array($names) ? $names :  explode(",","$names");
 
         header('Content-Type: text/event-stream');
         header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
         header('Connection: keep-alive');
         header('X-Accel-Buffering: no'); // Nginx: unbuffered responses suitable for Comet and HTTP streaming applications
 
-        $callback = function () use($chanel,$names) {
+        $callback = function () use($chanel,$namesArray) {
+            $res = null;
             try {
                 if(SSE_MAX_EXECUTION_TIME < time()) {
                     exit;
                 }; 
                 RestApi::$TTL = RestApi::$TTL == 0 ? (isset($_REQUEST["from"]) ? intval($_REQUEST["from"]) : time()) : RestApi::$TTL;
+
+                // clean old events
+                maya()->sse->remove($chanel,[
+                    'exp' => [
+                        '$lt' => RestApi::$TTL
+                    ]
+                ]);
+                // purge old ids
+                foreach (RestApi::$ids as $id => $ttl) {
+                    if($ttl < RestApi::$TTL){
+                        unset($id);
+                    }
+                }
                 $filter = [
                     'exp' => [
                         '$gte' => RestApi::$TTL
                     ],
                     '_id' => [
-                        "\$nin" => RestApi::$ids
+                        '$nin' => array_keys(RestApi::$ids)
                     ],
+                    '$or' => array_map(function($name){
+                        return [
+                            "name" => [
+                                '$like' => $name
+                            ]
+                        ];
+                    },$namesArray)
                 ];
-                if(count($names)){
-                    $filter["name"] = [
-                        '$in' => $names
-                    ];
+                if(count($namesArray) == 0){
+                    unset($filter['$or']);
+                    maya()->stop(["error"=>"No Event selected"], 403);
+
+                } else if(count($namesArray) == 1){
+                    $filter["name"] = $filter['$or'][0]["name"];
+                    unset($filter['$or']);
                 }
+                unset($filter['$or']);
+                unset($filter['name']);
+
                 $res = maya()->sse->find($chanel,[
                     'filter'=> $filter
                 ])->toArray();
-                // clean old events
-                maya()->sse->remove($chanel,[
-                    'exp' => [
-                        '$gte' => time()
-                    ]
-                ]);
-                $id = mt_rand(1, 1000);
+                
                 if($res && is_array($res)){
                     $res =  array_map(function($event) use($chanel){
-                        $id = $event["_id"];
-                        RestApi::$ids[] = $id;
+                        $id = (isset($event["user"]['user'],$event["user"]['group']) ? ($event["user"]['user'].'@'.$event["user"]['group'].'#') : "").$event["_id"];
                         if(isset($event["deleteOnRead"]) && $event["deleteOnRead"]){
                             maya()->sse->remove($chanel,[ '_id' => $event["_id"] ]);
                         }
+                        RestApi::$ids[$event["_id"]] = $event["exp"];
                         return [
-                            'id' => $id.'#'.RestApi::$TTL,
+                            'id' => $id,
                             'event' => $event["name"],
                             'data' => $event["data"]
                         ];
-                    },$res);
+                    }, array_filter($res, function($el){
+                        return array_search($el["_id"], array_keys(RestApi::$ids)) === false;
+                    }));
                 }
 
             } catch (\Throwable $th) {
                 // Stop if something happens to clear connection, browser will retry
                 throw new StopSSEException();
+            }finally{
+                RestApi::$TTL = time();
+                return $res ? [
+                    "events" => $res
+                ] : false;
             }
-            RestApi::$TTL = time();
-            return $res ? [
-                "events" => $res
-            ] : false;
-            // return ['event' => 'ping', 'data' => 'ping data']; // Custom event temporarily: send ping event
-            // return ['id' => uniqid(), 'data' => json_encode(compact('news'))]; // Custom event Id
         };
         (new SSE(new Event($callback, $chanel)))->start(5);
     }
 
-    public function listen($chanel="events",$name="") {
-        if(is_string($name) && !empty($name)){
-            $this->_events($chanel,[$name]);
-        }else{
-            $this->_events($chanel,[]);
-        }
+    public function chanel($chanel,$name) {
+        $this->_events($name,$chanel);
     }
 }

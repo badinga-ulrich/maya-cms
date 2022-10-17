@@ -165,7 +165,6 @@
                     <div class="uk-flex-item-1" riot-mount>
                         <cp-search></cp-search>
                     </div>
-
                     @if($app('admin')->data['menu.modules']->count())
                     <div class="uk-hidden-small">
                         <ul class="uk-subnav app-modulesbar">

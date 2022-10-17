@@ -82,6 +82,7 @@ class Admin extends \Maya\AuthController {
             ],
             'in_menu' => false
         ];
+        $defaultPHP = "<?php\n\n";
 
         $collection = $default;
 
@@ -121,21 +122,55 @@ class Admin extends \Maya\AuthController {
             if (!$superAdmin) $aclgroups[] = $group;
         }
 
+        
         // rules
         $rules = [
-            'create' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.create.php"),
-            'read'   => !$name ? "<?php\n\n" : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.read.php"),
-            'update' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.update.php"),
-            'delete' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.delete.php"),
+            'create' => !$name || !$this->app->path("#storage:collections/rules/{$name}.create.php") ? $defaultPHP : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.create.php"),
+            'read'   => !$name || !$this->app->path("#storage:collections/rules/{$name}.read.php") ? $defaultPHP : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.read.php"),
+            'update' => !$name || !$this->app->path("#storage:collections/rules/{$name}.update.php") ? $defaultPHP : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.update.php"),
+            'delete' => !$name || !$this->app->path("#storage:collections/rules/{$name}.delete.php") ? $defaultPHP : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.delete.php"),
         ];
 
-        return $this->render('collections:views/collection.php', compact('collection', 'templates', 'aclgroups', 'rules'));
+        // views
+        $defaultItem = <<<HTML
+        <div class="collection-grid-avatar-container uk-margin-top">
+            <div class="collection-grid-avatar">
+                <cp-account account="{entry._mby || entry._by}" label="{false}" size="40" if="{entry._mby || entry._by}"></cp-account>
+                <cp-gravatar alt="?" size="40" if="{!(entry._mby || entry._by)}"></cp-gravatar>
+            </div>
+        </div>
+        <div class="uk-flex uk-flex-middle uk-margin-small-top">
+
+            <div class="uk-flex-item-1 uk-margin-small-right uk-text-small">
+                <span class="uk-text-success uk-margin-small-right">{ App.Utils.dateformat( new Date( 1000 * entry._created )) }</span>
+                <span class="uk-text-primary">{ App.Utils.dateformat( new Date( 1000 * entry._modified )) }</span>
+            </div>
+
+        </div>
+
+        <div class="uk-margin-top uk-scrollable-box">
+            <div class="uk-margin-small-bottom" each="{field,idy in parent.fields}" if="{ field.name != '_modified' && field.name != '_created' }">
+                <span class="uk-text-small uk-text-uppercase uk-text-muted">{ field.label || field.name }</span>
+                <a class="uk-link-muted uk-text-small uk-display-block uk-text-truncate" href="@route('/collections/entry/'.\$collection['name'])/{ parent.entry._id }">
+                    <raw content="{ App.Utils.renderValue(field.type, parent.entry[field.name], field, lang) }" if="{parent.entry[field.name] !== undefined}"></raw>
+                    <span class="uk-icon-eye-slash uk-text-muted" if="{parent.entry[field.name] === undefined}"></span>
+                </a>
+            </div>
+        </div>
+        HTML;
+        $views = [
+            'item' => !$name || !$this->app->path("#storage:collections/views/{$name}.item.php") ? $defaultItem : $this->app->helper('fs')->read("#storage:collections/views/{$name}.item.php"),
+            'bootstrap' => !$name || !$this->app->path("#storage:collections/views/{$name}.bootstrap.php") ? $defaultPHP : $this->app->helper('fs')->read("#storage:collections/views/{$name}.bootstrap.php"),
+        ];
+
+        return $this->render('collections:views/collection.php', compact('collection', 'templates', 'aclgroups', 'rules', 'views'));
     }
 
     public function save_collection() {
 
         $collection = $this->param('collection');
         $rules      = $this->param('rules', null);
+        $views      = $this->param('views', null);
 
         if (!$collection) {
             return false;
@@ -155,7 +190,7 @@ class Admin extends \Maya\AuthController {
             $this->stop(['error' => "Saving failed! Collection is locked!"], 412);
         }
 
-        $collection = $this->module('collections')->saveCollection($collection['name'], $collection, $rules);
+        $collection = $this->module('collections')->saveCollection($collection['name'], $collection, $rules, $views);
 
         if (!$isUpdate) {
             $this->app->helper('admin')->lockResourceId($collection['_id']);
@@ -324,10 +359,11 @@ class Admin extends \Maya\AuthController {
 
         try {
             $entry = $this->module('collections')->save($collection['name'], $entry, ['revision' => $revision]);
+
         } catch(\Throwable $e) {
+            
             $this->app->stop(['error' => $e->getMessage()], 412);
         }
-
         $this->app->helper('admin')->lockResourceId($entry['_id']);
 
         return $entry;
@@ -459,7 +495,6 @@ class Admin extends \Maya\AuthController {
         if (!$collection) return false;
 
         $collection = $this->app->module('collections')->collection($collection);
-
         if (isset($options['filter']) && is_string($options['filter'])) {
 
             $filter = null;
@@ -476,6 +511,32 @@ class Admin extends \Maya\AuthController {
             }
 
             $options['filter'] = $filter;
+        }
+
+        if (isset($options['search']) && is_string($options['search'])) {
+
+            $filter = null;
+
+            if (\preg_match('/^\{(.*)\}$/', $options['search'])) {
+
+                try {
+                    $filter = json5_decode($options['search'], true);
+                } catch (\Exception $e) {}
+            }
+
+            if (!$filter) {
+                $filter = $this->_filter($options['search'], $collection, $options['lang'] ?? null);
+            }
+            if(isset($options['filter']) && is_array($options['filter'])){
+                $options['filter'] = [
+                    '$and' => [
+                        $filter, 
+                        $options['filter']
+                    ]
+                ];
+            }else {
+                $options['filter'] = $filter;
+            }
         }
 
         $this->app->trigger("collections.admin.find.before.{$collection['name']}", [&$options]);

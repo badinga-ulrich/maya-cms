@@ -31,7 +31,7 @@
 
 <div class="uk-margin-top" riot-view>
 
-    <div class="uk-margin uk-text-center uk-text-muted" show="{ (Array.isArray(entries) && entries.length) || filter}">
+    <div class="uk-margin uk-text-center uk-text-muted" show="{ (Array.isArray(entries) && entries.length) || filter || this.tabIndexGroup > -1}">
 
         <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'collections:icon.svg')" width="50" alt="icon" data-uk-svg>
         @if($collection['description'])
@@ -54,7 +54,7 @@
 
         </div>
 
-        <div class="uk-width-medium-1-3 uk-viewport-height-1-2 uk-container-center uk-text-center uk-flex uk-flex-center uk-flex-middle" if="{ !loading && !entries.length && !filter }">
+        <div class="uk-width-medium-1-3 uk-viewport-height-1-2 uk-container-center uk-text-center uk-flex uk-flex-center uk-flex-middle" if="{ !loading && !entries.length && !filter && tabIndexGroup == -1}">
 
             <div class="uk-animation-scale">
 
@@ -71,16 +71,16 @@
 
         </div>
 
-        <div class="uk-clearfix uk-margin-top" show="{ !loading && (entries.length || filter) }">
+        <div class="uk-clearfix uk-margin-top" show="{ !loading && (entries.length || filter || tabIndexGroup > -1) }">
+            @if(!isset($collection['defaultView']) || $collection['defaultView'] == "AUTO" )
 
             <div class="uk-float-left">
-
                 <div class="uk-button-group">
                     <button class="uk-button uk-button-large {listmode=='list' && 'uk-button-primary'}" onclick="{ toggleListMode }"><i class="uk-icon-list"></i></button>
                     <button class="uk-button uk-button-large {listmode=='grid' && 'uk-button-primary'}" onclick="{ toggleListMode }"><i class="uk-icon-th"></i></button>
                 </div>
-
             </div>
+            @endif
 
             <div class="uk-float-left uk-form-select uk-margin-small-left" if="{ !loading && languages.length }">
                 <span class="uk-button uk-button-large uk-button-link {lang ? 'uk-text-primary' : 'uk-text-muted'}">
@@ -125,12 +125,43 @@
             </div>
         </div>
 
-        <div class="uk-margin-top" show="{ !loading && (entries.length || filter) }">
-
-        <div class="uk-text-xlarge uk-text-muted uk-viewport-height-1-3 uk-flex uk-flex-center uk-flex-middle" if="{ !entries.length && filter && !loading }">
+        <div class="uk-margin-top" show="{ !loading && (entries.length || filter || tabIndexGroup > -1) }">
+        <div  if="{  groups.length > 1 }" class="uk-tab-center">
+            <ul class="uk-tab">
+                <li each="{group,idx in groups}" class="{ tabIndexGroup == idx && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="{idx}">{ App.i18n.get(group.name) }</a></li>
+            </ul>
+        </div>
+<div class="uk-text-xlarge uk-text-muted uk-viewport-height-1-3 uk-flex uk-flex-center uk-flex-middle" if="{ !entries.length && (filter || tabIndexGroup > -1) && !loading }">
             <div>@lang('No entries found')</div>
         </div>
 
+        <div class="uk-grid uk-grid-match uk-grid-width-medium-1-4 uk-flex-center" if="{ entries.length && !loading && listmode=='custom' }">
+
+            <div class="uk-grid-margin" each="{entry,idx in entries}">
+
+                <div class="uk-panel uk-panel-box uk-panel-card uk-panel-card-hover">
+                    @if($app->path('#storage:collections/views/'.$collection['name'].'.item.php'))
+                        @render('#storage:collections/views/'.$collection['name'].'.item.php', compact('collection'))
+                    @else
+                        <a class="uk-link-muted uk-text-small uk-display-block uk-text-truncate" href="@route('/collections/entry/'.$collection['name'])/{ entry._id }">
+                            <center>
+                                <h1>{{$collection['name']}}</h1>
+                                <div class="uk-margin-small uk-panel uk-panel-box">
+                                    { entry._id }
+                                </div>
+                                <div class="collection-grid-avatar-container uk-margin-top">
+                                    <div class="collection-grid-avatar">
+                                        <cp-account account="{entry._mby || entry._by}" label="{false}" size="40" if="{entry._mby || entry._by}"></cp-account>
+                                        <cp-gravatar alt="?" size="40" if="{!(entry._mby || entry._by)}"></cp-gravatar>
+                                    </div>
+                                </div>
+                            </center>
+                        </a>
+                    @endif
+                </div>
+            </div>
+
+        </div>
 
         <div class="uk-grid uk-grid-match uk-grid-width-medium-1-4 uk-flex-center" if="{ entries.length && !loading && listmode=='grid' }">
 
@@ -327,9 +358,13 @@
         this.limit      = 20;
         this.entries    = [];
         this.fieldsidx  = {};
+        this.groups     = !Array.isArray(this.collection.groups) ? [] : this.collection.groups.map(g=>g.value).filter(g=>g.enabled);
+        this.tabIndexGroup   = this.groups.length ? 0 : -1;
         this.imageField = null;
         this.languages  = App.$data.languages;
-
+        if (!this.collection.defaultView) {
+            this.collection.defaultView = 'AUTO';
+        }
         if (this.languages.length) {
             this.lang = App.session.get('collections.entry.'+this.collection._id+'.lang', '');
         }
@@ -356,7 +391,13 @@
         this.sort = {}
         this.sort[this.collection.sort.column] = this.collection.sort.dir
         this.selected = [];
-        this.listmode = App.session.get('collections.entries.'+this.collection.name+'.listmode', 'list');
+        this.listmode = this.collection.defaultView == 'AUTO' ? 
+            App.session.get('collections.entries.'+this.collection.name+'.listmode', 'list') : (
+                this.collection.defaultView == "GRID" ? 
+                'grid' : (
+                    this.collection.defaultView == "CUSTOM" ? 'custom' : 'list'
+                )
+            );
 
         this.on('mount', function(){
 
@@ -378,7 +419,15 @@
         });
 
         initState() {
-
+            if(sessionStorage.hasOwnProperty(this.collection.name+"-this.tabIndexGroup")){
+                this.tabIndexGroup = sessionStorage.getItem(this.collection.name+"-this.tabIndexGroup");
+            }
+            if(this.groups[this.tabIndexGroup]){
+                sessionStorage.setItem(this.collection.name+"-this.tabIndexGroup", this.tabIndexGroup);
+            }else{
+                sessionStorage.removeItem(this.collection.name+"-this.tabIndexGroup");
+                this.tabIndexGroup = -1;
+            }
             var searchParams = App.Utils.params();
 
             if (searchParams.has('q')) {
@@ -390,12 +439,14 @@
                     if (q.sort) this.sort = q.sort;
                     if (q.page) this.page = q.page;
                     if (q.limit) this.limit = (parseInt(q.limit) || 20);
-                    if (q.filter) {
-                        this.filter = q.filter;
-                        this.refs.txtfilter.value = q.filter;
+                    if (q.search) {
+                        this.filter = q.search;
+                        this.refs.txtfilter.value = q.search;
                     }
 
                 } catch(e){}
+            }else{
+
             }
 
             this.load(true);
@@ -427,6 +478,16 @@
                 });
 
             }.bind(this));
+        }
+
+        toggleTab(e) {
+            var tabIndexGroup = e.target.getAttribute('data-tab');
+            if(this.tabIndexGroup != tabIndexGroup && this.groups[this.tabIndexGroup]){
+                this.tabIndexGroup = tabIndexGroup;
+                sessionStorage.getItem(this.collection.name+"-tabIndexGroup", this.tabIndexGroup);
+                this.load();
+                this.update();
+            }
         }
 
         removeselected() {
@@ -482,9 +543,12 @@
             }
 
             if (this.filter) {
-                options.filter = this.filter;
+                options.search = this.filter;
             }
-
+            var filter = this.groups[this.tabIndexGroup] && this.groups[this.tabIndexGroup].filter ? this.groups[this.tabIndexGroup].filter : null;
+            if(filter){
+                options.filter = filter;
+            }
             if (this.limit) {
                 options.limit = this.limit;
             }
@@ -499,13 +563,13 @@
                     null, null,
                     App.route(['/collections/entries/', this.collection.name, '?q=', JSON.stringify({
                         page: this.page || null,
-                        filter: this.filter || null,
+                        search: this.filter || null,
+                        filter : filter,
                         sort: this.sort || null,
                         limit: this.limit
                     })].join(''))
                 );
             }
-
             return App.request('/collections/find', {collection:this.collection.name, options:options}).then(function(data){
 
                 window.scrollTo(0, 0);

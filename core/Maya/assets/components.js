@@ -3847,12 +3847,13 @@ riot.tag2('field-repeater', '<div class="uk-alert" show="{!items.length}"> {App.
 
         this.visibility = {};
 
+        
         this.on('mount', function() {
-
+            
             UIkit.sortable(this.refs.itemscontainer, {
                 animation: false
             });
-
+            
             this.update();
         });
 
@@ -3960,7 +3961,7 @@ riot.tag2('field-repeater', '<div class="uk-alert" show="{!items.length}"> {App.
                 if (display == '$value') {
                     value = App.Utils.renderValue(meta.type, item.value, meta);
                 } else {
-                    value = _.get(item.value, display) || 'Item '+(idx+1);
+                    value = _.get(item.value, display) || this.concatDisplayString(item.value, display) || 'Item '+(idx+1);
                 }
 
                 return value;
@@ -3981,7 +3982,13 @@ riot.tag2('field-repeater', '<div class="uk-alert" show="{!items.length}"> {App.
 
             return {type:'text', options: {}};
         }.bind(this)
+        this.concatDisplayString = function(_entry,str) {
 
+            if (!str) return false;
+            return str.replace(/\{[^}]*\}/g, function(e){
+                return _entry[e.replace(/(\{|\})/g,"").trim()] || ""
+            }).trim();
+        }
 });
 
 riot.tag2('field-select', '<div if="{loading}"><i class="uk-icon-spinner uk-icon-spin"></i></div> <select ref="input" class="uk-width-1-1 {opts.cls}" bind="{opts.bind}" show="{!loading}" multiple="{opts.multiple}"> <option value=""></option> <optgroup each="{group in Object.keys(groups).sort()}" label="{group}"> <option each="{option,idx in parent.groups[group]}" riot-value="{option.value}" selected="{isSelected(option.value)}">{option.label}</option> </optgroup> <option each="{option,idx in options}" riot-value="{option.value}" selected="{isSelected(option.value)}">{option.label}</option> </select>', '', '', function(opts) {
@@ -4325,7 +4332,7 @@ riot.tag2('field-tags', '<div if="{loading}"><i class="uk-icon-spinner uk-icon-s
 
 });
 
-riot.tag2('field-text', '<div class="uk-position-relative field-text-container"> <input ref="input" class="uk-width-1-1" bind="{opts.bind}" type="{opts.type || \'text\'}" oninput="{updateLengthIndicator}" placeholder="{opts.placeholder}"> <span class="uk-text-muted" ref="lengthIndicator" show="{type==\'text\'}" hide="{opts.showCount === false}"></span> </div> <div class="uk-text-muted uk-text-small uk-margin-small-top" if="{opts.slug}" title="Slug"> {slug} </div>', 'field-text [ref="input"][type=text],[data-is="field-text"] [ref="input"][type=text]{ padding-right: 30px !important; } field-text .field-text-container span,[data-is="field-text"] .field-text-container span{ position: absolute; top: 50%; right: 0; font-family: monospace; transform: translateY(-50%) scale(.9); }', '', function(opts) {
+riot.tag2('field-text', '<div class="uk-position-relative field-text-container"> <input ref="input" class="uk-width-1-1" bind="{opts.bind}" type="{opts.type || \'text\'}" oninput="{updateLengthIndicator}" placeholder="{opts.placeholder}" readonly="{ opts.readonly }"> <span class="uk-text-muted" ref="lengthIndicator" show="{type==\'text\'}" hide="{opts.showCount === false}"></span> </div> <div class="uk-text-muted uk-text-small uk-margin-small-top" if="{opts.slug}" title="Slug"> {slug} </div>', 'field-text [ref="input"][type=text],[data-is="field-text"] [ref="input"][type=text]{ padding-right: 30px !important; } field-text .field-text-container span,[data-is="field-text"] .field-text-container span{ position: absolute; top: 50%; right: 0; font-family: monospace; transform: translateY(-50%) scale(.9); }', '', function(opts) {
 
         var $this = this;
 

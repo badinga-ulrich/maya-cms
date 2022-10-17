@@ -93,6 +93,7 @@
                 <ul class="uk-tab uk-margin-large-bottom">
                     <li class="{ tab=='fields' && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="fields">{ App.i18n.get('Fields') }</a></li>
                     <li class="{ tab=='auth' && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="auth">{ App.i18n.get('Permissions') }</a></li>
+                    <li class="{ tab=='groups' && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="groups">{ App.i18n.get('Groups') }</a></li>
                     <li class="{ tab=='other' && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="other">{ App.i18n.get('Other') }</a></li>
                 </ul>
 
@@ -181,17 +182,22 @@
                             <div class="uk-flex-item-1"><span class="uk-badge uk-badge-danger uk-text-uppercase uk-margin-small-bottom badge-rule">Delete</span></div>
                             <div><field-boolean bind="collection.rules.delete.enabled" label="@lang('Enabled')"></field-boolean></div>
                         </div>
-                        <field-code bind="rules.delete" syntax="php" if="{collection.rules.delete.enabled}" height="350"></field-code>
+                        <field-code bind="rules.item" syntax="php" if="{collection.rules.delete.enabled}" height="350"></field-code>
                     </div>
 
                 </div>
 
+                <div class="uk-form-row" show="{tab=='groups'}">
 
+                    <field-repeater bind="collection.groups" field="{groupsOptions.field}"></field-repeater>
+
+                </div>
                 <div class="uk-form-row" show="{tab=='other'}">
-
-                    <div class="uk-form-row">
-                        <strong class="uk-text-small uk-text-uppercase">@lang('Content Preview')</strong>
-                        <div class="uk-margin-top"><field-boolean bind="collection.contentpreview.enabled" label="@lang('Enabled')"></field-boolean></div>
+                    <div class="uk-margin uk-panel-box uk-panel-card uk-form-row">
+                        <div class="uk-clearfix">
+                            <strong class="uk-float-left uk-text-small uk-text-uppercase">@lang('Content Preview')</strong>
+                            <div class="uk-float-right "><field-boolean bind="collection.contentpreview.enabled" label="@lang('Enabled')"></field-boolean></div>
+                        </div>
                         <div class="uk-form-icon uk-form uk-width-1-1 uk-text-muted uk-margin-top" show="{collection.contentpreview && collection.contentpreview.enabled}">
                             <i class="uk-icon-globe"></i>
                             <input class="uk-width-1-1 uk-form-large uk-text-primary" type="url" placeholder="@lang('http://...')" bind="collection.contentpreview.url">
@@ -212,7 +218,33 @@
                         </div>
 
                     </div>
-
+                    <div class="uk-margin uk-panel-box uk-panel-card">
+                        <div class="uk-clearfix uk-margin-top">
+                            <div class="uk-float-left">
+                                <strong class="uk-text-small uk-text-uppercase">@lang('Item View')</strong>
+                            </div>
+                            <div class="uk-float-right">
+                                <div class="uk-button-group">
+                                    <a class="uk-button uk-button-large {collection.defaultView=='AUTO' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('AUTO') }"><i class="uk-icon-circle-thin"></i></a>
+                                    <a class="uk-button uk-button-large {collection.defaultView=='LIST' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('LIST') }"><i class="uk-icon-list"></i></a>
+                                    <a class="uk-button uk-button-large {collection.defaultView=='GRID' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('GRID') }"><i class="uk-icon-th"></i></a>
+                                    <a class="uk-button uk-button-large {collection.defaultView=='CUSTOM' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('CUSTOM') }"><i class="uk-icon-code"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <field-code bind="views.item" syntax="html" if="{collection.views.item}" height="350"></field-code>
+                    </div>
+                    <div class="uk-margin uk-panel-box uk-panel-card uk-form-row">
+                        <div class="uk-clearfix" style="
+                            padding: 5px;
+                            padding-bottom: 14px;
+                        ">
+                            <strong class="uk-float-left uk-text-small uk-text-uppercase">@lang('Bootstrap')</strong>
+                            <div class="uk-float-right "><field-boolean bind="collection.views.bootstrap" label="@lang('Enabled')"></field-boolean></div>
+                        </div>
+                        <field-code bind="views.bootstrap" syntax="php" if="{collection.views.bootstrap}" height="350"></field-code>
+                    </div>
+                    
                 </div>
 
             </div>
@@ -221,12 +253,10 @@
 
         <cp-actionbar>
             <div class="uk-container uk-container-center">
-
                 <div class="uk-button-group">
                     <button class="uk-button uk-button-large uk-button-primary">@lang('Save')</button>
                     <a class="uk-button uk-button-large" href="@route('/collections/entries')/{ collection.name }" if="{ collection._id }">@lang('Show entries')</a>
                 </div>
-
                 <a class="uk-button uk-button-large uk-button-link" href="@route('/collections')">
                     <span show="{ !collection._id }">@lang('Cancel')</span>
                     <span show="{ collection._id }">@lang('Close')</span>
@@ -253,6 +283,23 @@
         this.collection = {{ json_encode($collection) }};
         this.templates  = {{ json_encode($templates) }};
         this.aclgroups  = {{ json_encode($aclgroups) }};
+        this.groupsOptions = {
+            "field": {
+                "type": "set", 
+                "label": "Group",
+                "display" : " {name}",
+                "options" : {
+                    "fields": [
+                        {"name":"name", "type": "text", "label" : "Nom du groupe"},
+                        {"name":"filter", "type": "object", "options" : {"height": "300px"}, "label" : App.i18n.get('Filter')},
+                        {"name":"enabled", "type": "boolean","default": false,"label": App.i18n.get('Enabled')},
+                    ]
+                }
+            },
+            "display": null, // display value on re-order
+            "limit": null
+        };
+
 
         this.collection.rules = this.collection.rules || {
             "create" : {enabled:false},
@@ -270,20 +317,44 @@
 
         this.rules = {{ json_encode($rules) }};
 
+        this.collection.views = this.collection.views || {
+            "item" : {enabled:false},
+            "bootstrap" : {enabled:false},
+        };
+
+        // hack to not break old installations - @todo remove in future
+        'item,bootstrap'.split(',').forEach(function(m){
+            if (Array.isArray($this.collection.views[m])) {
+                $this.collection.views[m] = {enabled:false};
+            }
+        })
+        this.views = {{ json_encode($views) }};
+
         this.tab = 'fields';
 
         if (!this.collection.acl) {
             this.collection.acl = {};
         }
-
+        
         if (Array.isArray(this.collection.acl)) {
             this.collection.acl = {};
+        }
+        if (!this.collection.groups) {
+            this.collection.groups = [];
+        }
+
+        if (!Array.isArray(this.collection.groups)) {
+            this.collection.groups = [];
         }
 
         this.fieldsSortDirectionOptions = [
             { value:  1, label: App.i18n.get('ASC') },
             { value: -1, label: App.i18n.get('DESC') }
         ];
+
+        if (!this.collection.defaultView) {
+            this.collection.defaultView = 'AUTO';
+        }
 
         this.on('update', function(){
 
@@ -330,6 +401,11 @@
             }, 60000);
         });
 
+        setDefaultView(e) {
+            $this.collection.defaultView = e;
+            $this.collection.views.item = (e == 'CUSTOM');
+        }
+
         toggleTab(e) {
             this.tab = e.target.getAttribute('data-tab');
         }
@@ -353,7 +429,7 @@
 
             if (e) e.preventDefault();
 
-            App.request('/collections/save_collection', {collection: this.collection, rules: this.rules}).then(function(collection) {
+            App.request('/collections/save_collection', {collection: this.collection, rules: this.rules, views : this.views}).then(function(collection) {
 
                 App.ui.notify("Saving successful", "success");
                 $this.collection = collection;

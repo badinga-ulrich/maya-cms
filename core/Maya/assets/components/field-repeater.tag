@@ -176,7 +176,7 @@
                 if (display == '$value') {
                     value = App.Utils.renderValue(meta.type, item.value, meta);
                 } else {
-                    value = _.get(item.value, display) || 'Item '+(idx+1);
+                    value = _.get(item.value, display) || this.concatDisplayString(item.value, display) || 'Item '+(idx+1);
                 }
 
                 return value;
@@ -196,6 +196,14 @@
             }
 
             return {type:'text', options: {}};
+        }
+        
+        concatDisplayString(_entry,str) {
+
+            if (!str) return false;
+            return str.replace(/\{[^}]*\}/g, function(e){
+                return _entry[e.replace(/(\{|\})/g,"").trim()] || ""
+            }).trim();
         }
 
     </script>

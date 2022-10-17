@@ -13,12 +13,12 @@
       width: 100%;
     }
   </style>
-  <link href="//unpkg.com/graphiql@0.11.11/graphiql.css" rel="stylesheet" />
-  <script src="//unpkg.com/react@15.6.1/dist/react.min.js"></script>
-  <script src="//unpkg.com/react-dom@15.6.1/dist/react-dom.min.js"></script>
-  <script src="//unpkg.com/graphiql@0.11.11/graphiql.min.js"></script>
+  <link href="../core/GraphQL/assets/graphiql.css" rel="stylesheet" />
+  <script src="../core/GraphQL/assets/react.min.js"></script>
+  <script src="../core/GraphQL/assets/react-dom.min.js"></script>
+  <script src="../core/GraphQL/assets/graphiql.min.js"></script>
   
-  <script src="//cdn.jsdelivr.net/fetch/2.0.1/fetch.min.js"></script>
+  <script src="../core/GraphQL/assets/fetch.min.js"></script>
   
 </head>
 <body>
@@ -47,12 +47,15 @@
     };
 
       // Defines a GraphQL fetcher using the fetch API.
-      function graphQLHttpFetcher(graphQLParams) {
+      function graphQLHttpFetcher(graphQLParams, options) {
+        console.log((arguments));
           return fetch(window.location.origin + '@route('/graphql/query')', {
             method: 'post',
             headers: {
               'Accept': 'application/json',
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              ...(options && options.headers && typeof options.headers == "object" && Array.isArray(options.headers) ? options.headers : {})
+
             },
             body: JSON.stringify(graphQLParams)
           }).then(function (response) {
@@ -89,28 +92,49 @@
         old[v] = parameters[v];
         return old;
       }, {});
-
       history.replaceState(null, null, locationQuery(cleanParams) + window.location.hash);
     }
     // Render <GraphiQL /> into the body.
     ReactDOM.render(
       React.createElement(GraphiQL, {
         fetcher: fetcher,
-        onEditQuery: onEditQuery,
-        onEditVariables: onEditVariables,
+        // onEditQuery: onEditQuery,
+        // onEditVariables: onEditVariables,
         onEditOperationName: onEditOperationName,
-        query: "{}",
-        response: null,
-        variables: null,
-        operationName: null,
-        editorTheme: null,
-        websocketConnectionParams: null,
+        // query: "{}",
+        // response: null,
+        // variables: null,
+        operationName: "Query",
+        // editorTheme: null,
+        // websocketConnectionParams: null,
       }),
       document.body
     );
   </script>
   <style>
-    .graphiql-container .editorWrap{
+
+    button.graphiql-un-styled.graphiql-tab-add {
+      background: #fff;
+      margin: 0 10px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--border-radius-8);
+    }
+    .graphiql-tabs {
+      padding: 0 var(--px-12);
+    }
+    .graphiql-tabs, .graphiql-tab.graphiql-tab {
+        height: 40px;
+    }
+    .graphiql-logo
+    /* , button.graphiql-un-styled.graphiql-tab-add */
+    , .graphiql-editor-tools-tabs > button:nth-child(2) {
+      display: none;
+    }
+    /* .graphiql-container .editorWrap{
       overflow: hidden;
     }
     body > div > div.editorWrap > div.topBarWrap > div > div.title{
@@ -118,7 +142,7 @@
     }
     body > div > div.editorWrap > div.topBarWrap > div > div.execute-button-wrap{
       margin-left: 0;
-    }
+    } */
   </style>
 
 </body>

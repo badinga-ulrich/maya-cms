@@ -486,14 +486,14 @@ $app->on('maya.bootstrap', function() use($app) {
                 if (!$data) {
                     return false;
                 }
-                return implode("\n",[
-                    "<html>","<head>",
+                return eval(implode("\n",[
+                    "?> <html>","<head>",
                         "<title>",$page['label'],"</title>",
                         "<style>",$data["css"] ?? "","</style>",
                       "</head>",
                       "<body>",$data["html"] ?? "","</body>",
                       "<script>",$data["js"] ?? "","</script>",
-                    "</html>"]);
+                    "</html>", "<?php"]));
             });
         }
     }

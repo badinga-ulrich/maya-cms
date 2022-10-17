@@ -9,7 +9,6 @@
  */
 
 $app->on('admin.init', function() {
-
     if (!$this->module('maya')->getGroupRights('singletons') && !$this->module('singletons')->getSingletonsInGroup()) {
 
         $this->bind('/singletons/*', function() {

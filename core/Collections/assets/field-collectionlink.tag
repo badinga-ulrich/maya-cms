@@ -470,11 +470,9 @@
 
         if (!opts.display) return false;
 
-        var str = opts.display;
-        Object.keys(_entry).forEach(function(k) {
-            str = str.replace('{'+k+'}', _entry[k])
-        });
-        return str;
+        return opts.display.replace(/\{[^}]*\}/g, function(e){
+            return _entry[e.replace(/(\{|\})/g,"").trim()] || ""
+        }).trim();
     }
 
 

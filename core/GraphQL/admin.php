@@ -22,14 +22,6 @@ $app->on('admin.init', function() {
             ]);
         });
         
-        // add to modules menu
-        $this->helper('admin')->addMenuItem('modules', [
-            'label' => 'GraphQL',
-            'icon'  => 'graphql:icon.svg',
-            'route' => '/graphql/playground',
-            'active' => $active
-        ]);
-        
         if ($active) {
             $this->helper('admin')->favicon = 'graphql:icon.svg';
         } 

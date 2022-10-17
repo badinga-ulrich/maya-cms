@@ -20,7 +20,6 @@ class Query {
 
         // load field schema defenitions
         foreach ([
-            // 'region', // deprecated and will be removed in the future
             'collection',
             'singleton',
             'dynamic_collections',

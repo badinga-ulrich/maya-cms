@@ -14,7 +14,7 @@
 
             <div id="settings-info" class="uk-switcher">
 
-                <div>
+                <div id="SYSTEM">
 
                     <p><strong><span class="uk-badge app-badge">System</span></strong></p>
 
@@ -96,7 +96,7 @@
 
                 </div>
 
-                <div>
+                <div id="PHP">
                     <p>
                         <strong><span class="uk-badge app-badge">PHP</span></strong>
                     </p>
@@ -141,13 +141,8 @@
                         </tbody>
                     </table>
                 </div>
-                <div>
-                    <p>
-                        <strong><span class="uk-badge app-badge">SSE</span></strong>
-                    </p>
-                </div>
                 
-            @trigger("maya.settings.infopage.main.menu")
+                @trigger("maya.settings.infopage.main.menu")
             </div>
 
 
@@ -160,7 +155,6 @@
             <ul class="uk-nav uk-nav-side" data-uk-switcher="connect:'#settings-info'">
                 <li><a href="#SYSTEM">System</a></li>
                 <li><a href="#PHP">PHP</a></li>
-                <li><a href="#SSE">SSE</a></li>
                 @trigger("maya.settings.infopage.aside.menu")
             </ul>
 
@@ -186,12 +180,6 @@
                     $this.cacheSize = rsp.size ? rsp.size_pretty : 0;
                     $this.update();
                 });
-                if($this.user["api_key"]){
-                    const source = new EventSource('/api/sse/listen?token='+$this.user["api_key"], {withCredentials: true});
-                    source.addEventListener('collections.find.after.posts', function (event) {
-                        console.log(JSON.parse(event.data));
-                    }, false);
-                }
 
             });
 
@@ -322,6 +310,9 @@
                   return null
               }
             }
+            /* add script */
+            @trigger("maya.settings.infopage.script")
+            /* end script */
 
         </script>
 

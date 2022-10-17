@@ -87,7 +87,7 @@ class Event
         return $this;
     }
     private function showData($data){
-        return implode("\ndata: ",explode("\n",json_encode($data)));
+        return implode("\ndata: ",explode("\n",json_encode($data,JSON_PRETTY_PRINT)));
     }
 
     public function __toString()

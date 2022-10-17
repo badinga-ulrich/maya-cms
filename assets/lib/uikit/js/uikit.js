@@ -3418,7 +3418,6 @@
                 e.preventDefault();
 
                 var item = UI.$(this).attr('data-uk-switcher-item');
-
                 if ($this.index == item) return;
 
                 switch(item) {

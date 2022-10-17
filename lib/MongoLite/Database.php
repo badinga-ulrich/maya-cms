@@ -348,7 +348,22 @@ class UtilArrayQuery {
 
         return true;
     }
-
+    private static function like($needle, $haystack, $delimiter = '~')
+    {
+        // replace * by %
+        $needle = str_replace('*', '%', $needle);
+        // Escape meta-characters from the string so that they don't gain special significance in the regex
+        $needle = preg_quote($needle, $delimiter);
+    
+        // Replace SQL wildcards with regex wildcards
+        $needle = str_replace('%', '.*?', $needle);
+        $needle = str_replace('_', '.', $needle);
+    
+        // Add delimiters, beginning + end of line and modifiers
+        $needle = $delimiter . '^' . $needle . '$' . $delimiter . 'isu';
+        // Matches are not useful in this case; we just need to know whether or not the needle was found.
+        return (bool) preg_match($needle, $haystack);
+    }
     private static function evaluate($func, $a, $b) {
 
         $r = false;
@@ -389,7 +404,7 @@ class UtilArrayQuery {
                     $r = $a < $b;
                 }
                 break;
-
+            
             case '$in' :
                 if (\is_array($a)) {
                     $r = \is_array($b) ? \count(\array_intersect($a, $b)) : false;
@@ -424,8 +439,16 @@ class UtilArrayQuery {
             case '$preg' :
             case '$match' :
             case '$not':
-                $r = (boolean) @\preg_match(isset($b[0]) && $b[0]=='/' ? $b : '/'.$b.'/iu', $a, $match);
+                $r = (boolean) @\preg_match(isset($b[0]) && $b[0]=='/' ? $b : '/'.$b.'/isu', $a, $match);
                 if ($func === '$not') {
+                    $r = !$r;
+                }
+                break;
+            
+            case '$like' :
+            case '$nlike' :
+                $r = (boolean) @self::like($b,$a,"/");
+                if ($func === '$nlike') {
                     $r = !$r;
                 }
                 break;

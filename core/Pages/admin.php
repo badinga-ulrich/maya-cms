@@ -15,9 +15,14 @@ spl_autoload_register(function($class){
       if(file_exists($class_path)) include_once($class_path);
     }
 });
-
 $app->on('admin.init', function() {
-
+    // $user = $this->module('maya')->getUser();
+    // var_dump(
+    //     "PAGES", 
+    //     $user,
+    //     $this->module('maya')->getGroupRights()
+    // );exit;
+    
     if (!$this->module('maya')->getGroupRights('pages') && !$this->module('pages')->getPagesInGroup()) {
 
         $this->bind('/pages/*', function() {
@@ -73,6 +78,13 @@ $app->on('admin.init', function() {
             'area'    => 'aside-right'
         ];
 
+    }, 100);
+
+
+
+    // dashboard widgets
+    $this->on('maya.groups.settings.generic', function($widgets) {
+        $this->renderView("pages:views/widgets/group.php");
     }, 100);
 
 
