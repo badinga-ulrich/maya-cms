@@ -86,7 +86,8 @@ $this->module('maya')->extend([
         }
         $mimes =  include($mimeTypeFile);
         if ($file = $this->app->path('#public:'.$params->route)) {
-            $mime = pathinfo($file)["extension"];
+            // var_dump($file); exit;
+            $mime = @pathinfo($file)["extension"];
             if($mime == "php"){
                 ob_start();
                 try {
@@ -97,13 +98,15 @@ $this->module('maya')->extend([
                 }finally{
                     ob_end_flush();
                 }
-            }else{
+                exit;
+            }else if($mime){
                 $mime = $mimes[$mime];
                 header('Content-Type: '.($mime === false ? "application/octet-stream" : $mime));
                 header('Content-Length: '.filesize($file));
-                readfile($file);
-            }
-            exit;
+                if(readfile($file)){
+                    exit;
+                }
+            };
         }
         return false;
     },
