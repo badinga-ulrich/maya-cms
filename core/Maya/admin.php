@@ -64,6 +64,7 @@ $assets = [
     'assets:lib/uikit/js/components/lightbox.min.js',
     'assets:lib/uikit/js/components/sortable.min.js',
     'assets:lib/uikit/js/components/sticky.min.js',
+    'assets:lib/html-to-image.min.js',
     'assets:lib/mousetrap.js',
     'assets:lib/storage.js',
     'assets:lib/i18n.js',

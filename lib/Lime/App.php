@@ -659,9 +659,10 @@ class App implements \ArrayAccess {
         if (\is_array($href)) {
             extract($href, \EXTR_OVERWRITE);
         }
-
-        $ispath = \strpos($src, ':') !== false && !\preg_match('#^(|http\:|https\:)//#', $src);
-        $output = '<link href="'.($ispath ? $this->pathToUrl($src):$src).($version ? "?ver={$version}":"").'" type="'.$type.'" rel="'.$rel.'">';
+        if($this->pathToUrl($src)){
+            $ispath = \strpos($src, ':') !== false && !\preg_match('#^(|http\:|https\:)//#', $src);
+            $output = '<link href="'.($ispath ? $this->pathToUrl($src):$src).($version ? "?ver={$version}":"").'" type="'.$type.'" rel="'.$rel.'">';
+        }
 
         return $output;
     }
@@ -681,10 +682,10 @@ class App implements \ArrayAccess {
         if (\is_array($src)) {
             extract($src, \EXTR_OVERWRITE);
         }
-
-        $ispath = \strpos($src, ':') !== false && !\preg_match('#^(|http\:|https\:)//#', $src);
-        $output = '<script src="'.($ispath ? $this->pathToUrl($src):$src).($version ? "?ver={$version}":"").'" type="'.$type.'" '.$load.'></script>';
-
+        if($this->pathToUrl($src)){
+            $ispath = \strpos($src, ':') !== false && !\preg_match('#^(|http\:|https\:)//#', $src);
+            $output = '<script src="'.($ispath ? $this->pathToUrl($src):$src).($version ? "?ver={$version}":"").'" type="'.$type.'" '.$load.'></script>';            
+        }
         return $output;
     }
 

@@ -36,7 +36,7 @@
                     @endforeach
                 </ul>
             </div>
-            @if(count($collections) > 5)
+            @if(count($groups) > 5)
             <div class="uk-panel-box-footer">
                 <a href="@route('/groups')">@lang('Show all')</a>
             </div>
