@@ -54,6 +54,28 @@ function printEl (input, config = {}) {
     }
     iFrameWindow.document.write(`
     <style>
+        body, html {
+            height: 100%;
+            width: 100%;
+        }
+        .container {
+            height: 100%;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 100%;
+            grid-template-rows: min-content 5fr min-content;
+            gap: 0px 0px;
+            grid-auto-flow: row;
+            grid-template-areas:
+                "head"
+                "content"
+                "footer";
+        }
+        .head { grid-area: head; }
+        .content { grid-area: content; }
+        .footer { grid-area: footer; }
+    </style>
+    <style>
       @page {
         size: ${pageSize};
         margin: ${margin}px;
@@ -62,7 +84,7 @@ function printEl (input, config = {}) {
     iFrameWindow.document.write(printContent); // content
     iFrameWindow.document.close();
     iFrameWindow.onafterprint = function () {
-        iFrame.parentNode?.removeChild(iFrame);
+        // iFrame.parentNode?.removeChild(iFrame);
         afterPrint && afterPrint();
     };
     iFrameWindow.onload = () => {
