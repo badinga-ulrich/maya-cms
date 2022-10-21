@@ -46,6 +46,7 @@ class App extends \Lime\App {
                     'extend'   => '<?php $extend(expr); ?>',
                     'base'     => '<?php $app->base(expr); ?>',
                     'route'    => '<?php $app->route(expr); ?>',
+                    'routeFull'=> '<?php $app->routeFull(expr); ?>',
                     'trigger'  => '<?php $app->trigger(expr); ?>',
                     'assets'   => '<?php echo $app->assets(expr); ?>',
                     'start'    => '<?php $app->start(expr); ?>',

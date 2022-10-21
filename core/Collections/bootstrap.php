@@ -829,3 +829,16 @@ if (MAYA_ADMIN_CP) {
 if (MAYA_CLI) {
     $this->path('#cli', __DIR__.'/cli');
 }
+
+// load boostrap colliections files
+$collections = ($this->module('collections')->collections());
+foreach ($collections as $name => $collection) {
+    $_bootstrap = maya()->path('#storage:collections/views/'.$collection['name'].'.bootstrap.php');
+    if(isset($collection['views'],$collection['views']['bootstrap']) && $collection['views']['bootstrap'] && $_bootstrap){
+        try {
+            include($_bootstrap);
+        } catch (\Throwable $th) {
+            // var_dump($th); exit;
+        }
+    }
+}

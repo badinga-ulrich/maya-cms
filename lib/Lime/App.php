@@ -278,8 +278,12 @@ class App implements \ArrayAccess {
         echo (\count($args)==1) ? $this->routeUrl($args[0]) : $this->routeUrl(\call_user_func_array('sprintf', $args));
 
     }
+    public function routeFull() {
+        $args = \func_get_args();
+        
+        echo (\count($args)==1) ? $this->routeFullUrl($args[0]) : $this->routeFullUrl(\call_user_func_array('sprintf', $args));
+    }
     public function routeFullUrl() {
-
         $args = \func_get_args();
         $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
         return  $actual_link . ((\count($args)==1) ? $this->routeUrl($args[0]) : $this->routeUrl(\call_user_func_array('sprintf', $args)));

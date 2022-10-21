@@ -419,9 +419,14 @@ var QRCode, vCard;
 
 				if (vCard.socialUrls) {
 					for (var key in vCard.socialUrls) {
-						if (vCard.socialUrls.hasOwnProperty(key) &&
-							vCard.socialUrls[key]) {
-							formattedVCardString += 'X-SOCIALPROFILE;TYPE=' + key + ':' + e(vCard.socialUrls[key]) + nl();
+						var value = vCard.socialUrls[key];
+						if(value.hasOwnProperty("value"))
+							value = value.value;
+						if(typeof value =="object" && value.hasOwnProperty("type") && value.hasOwnProperty("url")){
+							formattedVCardString += 'X-SOCIALPROFILE;TYPE=' + value.type + ':' + e(value.url) + nl();
+						}else if (vCard.socialUrls.hasOwnProperty(key) &&
+							value) {
+							formattedVCardString += 'X-SOCIALPROFILE;TYPE=' + key + ':' + e(value) + nl();
 						}
 					}
 				}
