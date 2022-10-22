@@ -44,6 +44,10 @@
                 this.slug = this.$getValue(opts.bind+'_slug') || '';
             }
 
+            if (opts.mask) {
+                $(this.refs.input).inputmask(opts.mask);
+            }
+
             (['maxlength', 'minlength', 'step', 'placeholder', 'pattern', 'size', 'min', 'max']).forEach( function(key) {
                 if (opts[key]) $this.refs.input.setAttribute(key, opts[key]);
             });

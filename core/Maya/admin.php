@@ -59,6 +59,7 @@ $assets = [
     'assets:lib/riot/riot.bind.js',
     'assets:lib/riot/riot.view.js',
     'assets:lib/uikit/js/uikit.min.js',
+    'assets:lib/jquery.inputmask.min.js',
     'assets:lib/uikit/js/components/notify.min.js',
     'assets:lib/uikit/js/components/tooltip.min.js',
     'assets:lib/uikit/js/components/lightbox.min.js',
