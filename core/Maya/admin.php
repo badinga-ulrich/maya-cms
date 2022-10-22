@@ -51,6 +51,7 @@ $assets = [
     // libs
     'assets:lib/moment.js',
     'assets:lib/jquery.js',
+    'assets:lib/jsonpath.js',
     'assets:lib/lodash.js',
     'assets:lib/qrcode.js',
     'assets:lib/chart.min.js',
