@@ -225,14 +225,35 @@
                             </div>
                             <div class="uk-float-right">
                                 <div class="uk-button-group">
-                                    <a class="uk-button uk-button-large {collection.defaultView=='AUTO' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('AUTO') }"><i class="uk-icon-circle-thin"></i></a>
-                                    <a class="uk-button uk-button-large {collection.defaultView=='LIST' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('LIST') }"><i class="uk-icon-list"></i></a>
-                                    <a class="uk-button uk-button-large {collection.defaultView=='GRID' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('GRID') }"><i class="uk-icon-th"></i></a>
-                                    <a class="uk-button uk-button-large {collection.defaultView=='CUSTOM' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('CUSTOM') }"><i class="uk-icon-code"></i></a>
+                                    <a title="@lang('Auto')" class="uk-button uk-button-large {collection.defaultView=='AUTO' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('AUTO') }"><i class="uk-icon-circle-thin"></i></a>
+                                    <a title="@lang('List')" class="uk-button uk-button-large {collection.defaultView=='LIST' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('LIST') }"><i class="uk-icon-list"></i></a>
+                                    <a title="@lang('Grid')" class="uk-button uk-button-large {collection.defaultView=='GRID' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('GRID') }"><i class="uk-icon-th"></i></a>
+                                    <a title="@lang('Map')" class="uk-button uk-button-large {collection.defaultView=='MAP' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('MAP') }"><i class="uk-icon-map"></i></a>
+                                    <a title="@lang('Custom')" class="uk-button uk-button-large {collection.defaultView=='CUSTOM' && 'uk-button-primary'}" onclick="{ ()=>setDefaultView('CUSTOM') }"><i class="uk-icon-code"></i></a>
                                 </div>
                             </div>
                         </div>
-                        <field-code bind="views.item" syntax="html" if="{collection.views.item}" height="350"></field-code>
+                        <div class="uk-grid uk-margin-top uk-margin-bottom" if="{collection.defaultView == 'MAP'}">
+                            <div class="uk-width-medium-1-2">
+                                <div class="uk-form-icon uk-form uk-width-1-1 uk-text-muted">
+                                    <i class="uk-icon-map-pin"></i>
+                                    <input class="uk-width-1-1 uk-form-large uk-text-primary" type="url" placeholder="@lang('Item Latitude')" bind="collection.map.lat"  title="Latitude">
+                                    <label class="uk-text-small">
+                                        <a target="_blank" href="#json-path-doc" data-uk-modal>
+                                            <i class="uk-icon-info"></i>&nbsp;&nbsp;
+                                            JSONPath Selector DOCUMENTATION
+                                        </a>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="uk-width-medium-1-2">
+                                <div class="uk-form-icon uk-form uk-width-1-1 uk-text-muted">
+                                    <i class="uk-icon-map-pin"></i>
+                                    <input class="uk-width-1-1 uk-form-large uk-text-primary" type="text" placeholder="@lang('Item Longitude')" bind="collection.map.lon" title="Logitude">
+                                </div>
+                            </div>
+                        </div>
+                        <field-code bind="views.item" syntax="html" if="{collection.defaultView == 'MAP' || collection.defaultView == 'CUSTOM'}" height="350"></field-code>
                     </div>
                     <div class="uk-margin uk-panel-box uk-panel-card uk-form-row">
                         <div class="uk-clearfix" style="
@@ -244,9 +265,7 @@
                         </div>
                         <field-code bind="views.bootstrap" syntax="php" if="{collection.views.bootstrap}" height="350"></field-code>
                     </div>
-                    
                 </div>
-
             </div>
 
         </div>
@@ -266,10 +285,20 @@
 
     </form>
 
+    <!-- This is the modal -->
+    <div id="json-path-doc" class="uk-modal">
+        <div class="uk-modal-dialog uk-modal-dialog-large">
+            <a href="" class="uk-modal-close uk-close uk-close-alt"></a>
+            @render('collections:views/partials/jsonpath.html')
+        </div>
+    </div>
     <style>
 
         .badge-rule {
             width: 50px;
+        }
+        #json-path-doc tr td:first-child {
+            color: #D05;
         }
 
     </style>
@@ -403,7 +432,7 @@
 
         setDefaultView(e) {
             $this.collection.defaultView = e;
-            $this.collection.views.item = (e == 'CUSTOM');
+            $this.collection.views.item = (e == 'CUSTOM' || e == 'MAP');
         }
 
         toggleTab(e) {

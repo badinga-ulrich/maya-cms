@@ -45,6 +45,18 @@
             }
 
             if (opts.mask) {
+                var mask = typeof opts.mask == "string" ? opts.mask: (typeof opts.mask == "object" && typeof opts.mask.mask == "string" ? opts.mask.mask : null );
+                if(typeof opts.mask == "string"){
+                    opts.mask = {}
+                }
+                opts.mask = Object.assign(opts.mask,mask ? {mask:mask} : {},typeof opts.mask.alias == "string" && opts.mask.alias == "numeric" ? {autoUnmask: true} : {}, {
+                    oncomplete : function(){
+                        $this.refs.input.$setValue($this.refs.input.value);
+                    },
+                    oncleared: function(){
+                        $this.refs.input.$setValue("");
+                    } 
+                });
                 $(this.refs.input).inputmask(opts.mask);
             }
 

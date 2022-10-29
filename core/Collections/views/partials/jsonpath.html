@@ -1,0 +1,187 @@
+                <div class="uk-overflow-containe">
+                    <table class="uk-table uk-table-striped uk-table-hover" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th>Expression</th>
+                                <th>Meaning</th>
+                                <th>Document</th>
+                            </tr>
+                        </thead>
+                            <tbody>
+                                <tr>
+                                    
+                                    <td>$.store.book[*].author</td>
+                                    <td>The authors of all books in the store</td>
+                                    <td rowspan="27" style="
+                                        width: 265px;
+                                        background: black;
+                                        color: green;
+                                        border-radius: 3px;
+                                        font-weight: bold;
+                                    ">
+                                    <p style="
+                                        position: -webkit-sticky; /* Safari */
+                                        position: sticky;
+                                        top: 15px;
+                                    ">{<br>&nbsp;&nbsp;"store": {<br>&nbsp;&nbsp;&nbsp;&nbsp;"book": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"category": "reference",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"author": "Nigel Rees",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"title": "Sayings of the Century",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"price": 8.95<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"category": "fiction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"author": "Herman Melville",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"title": "Moby Dick",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"isbn": "0-553-21311-3",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"price": 8.99<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"category": "fiction",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"author": "J.R.R. Tolkien",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"title": "The Lord of the Rings",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"isbn": "0-395-19395-8",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"price": 22.99<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;],<br>&nbsp;&nbsp;&nbsp;&nbsp;"bicycle": {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"color": "red",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"price": 19.95<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;},<br>&nbsp;&nbsp;"expensive": 10<br>}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..author</td>
+                                    <td>All authors</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$.store.*</td>
+                                    <td>All things in store, which are its books (a book array) and a red bicycle (a bicycle object).</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$.store..price</td>
+                                    <td>The price of everything in the store.</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book[2]</td>
+                                    <td>The third book (book object)</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book[(@.length-1)]<br>$..book[-1:]</td>
+                                    <td>The last book in order.</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book[0,1]<br>$..book[:2]</td>
+                                    <td>The first two books</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book[0][category,author]</td>
+                                    <td>The categories and authors of all books</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book[?(@.isbn)]</td>
+                                    <td>Filter all books with an ISBN number</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book[?(@.price&lt;10)]</td>
+                                    <td>Filter all books cheaper than 10</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..*[?(@property === 'price' &amp;&amp; @ !== 8.95)]</td>
+                                    <td>Obtain all property values of objects whose property is price and which does not equal 8.95</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$</td>
+                                    <td>The root of the JSON object (i.e., the whole object itself)</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..*</td>
+                                    <td>All Elements (and text) beneath root in an XML document. All members of a JSON structure beneath the root.</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..</td>
+                                    <td>All Elements in an XML document. All parent components of a JSON structure including root.</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..[?(@.price&gt;19)]^</td>
+                                    <td>Parent of those specific items with a price greater than 19 (i.e., the store value as the parent of the bicycle and the book array as parent of an individual book)</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$.store.*~</td>
+                                    <td>The property names of the store sub-object ("book" and "bicycle"). Useful with wildcard properties.</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$.store.book[?(@path !== "$['store']['book'][0]")]</td>
+                                    <td>All books besides that at the path pointing to the first</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book[?(@parent.bicycle &amp;&amp; @parent.bicycle.color === "red")].category</td>
+                                    <td>Grabs all categories of books where the parent object of the book has a bicycle child whose color is red (i.e., all the books)</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book.*[?(@property !== "category")]</td>
+                                    <td>Grabs all children of "book" except for "category" ones</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book[?(@property !== 0)]</td>
+                                    <td>Grabs all books whose property (which, being that we are reaching inside an array, is the numeric index) is not 0</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$.store.*[?(@parentProperty !== "book")]</td>
+                                    <td>Grabs the grandchildren of store whose parent property is not book (i.e., bicycle's children, "color" and "price")</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book.*[?(@parentProperty !== 0)]</td>
+                                    <td>Get the property values of all book instances whereby the parent property of these values (i.e., the array index holding the book item parent object) is not 0</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book[?(@.price === @root.store.book[2].price)]</td>
+                                    <td>Filter all books whose price equals the price of the third book</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book..*@number()</td>
+                                    <td>Get the numeric values within the book array</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book.*[?(@property === "category" &amp;&amp; @.match(/TION$/i))]</td>
+                                    <td>All categories of books which match the regex (end in 'TION' case insensitive)</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td>$..book.*[?(@property.match(/bn$/i))]^</td>
+                                    <td>All books which have a property matching the regex (end in 'TION' case insensitive)</td>
+                                    
+                                </tr>
+                                <tr>
+                                    
+                                    <td><code>`</code> (e.g., <code> `$</code> to match a property literally named <code>$</code>)</td>
+                                    <td>Escapes the entire sequence following (to be treated as a literal)</td>
+                                    
+                                </tr>
+                            </tbody> 
+                    </table>
+                </div>

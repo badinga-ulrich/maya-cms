@@ -24,6 +24,18 @@
 .collection-grid-avatar .uk-icon-spinner {
     display: none;
 }
+span[entry-custom-actions] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #007fff;
+    padding: 5px;
+    border-radius: 0 3px;
+    z-index: 1000;
+}
+span[entry-custom-actions] > a {
+    color: white !important;
+}
 
 </style>
 
@@ -158,6 +170,31 @@
                             </center>
                         </a>
                     @endif
+                    <span entry-custom-actions data-uk-dropdown="mode:'click', pos:'bottom-right'">
+
+                            <a class="uk-icon-bars"></a>
+
+                            <div class="uk-dropdown uk-dropdown-flip">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li class="uk-nav-header">@lang('Actions')</li>
+
+                                    @if($app->module('collections')->hasaccess($collection['name'], 'entries_edit'))
+                                    <li><a href="@route('/collections/entry/'.$collection['name'])/{ entry._id }">@lang('Edit')</a></li>
+                                    @else
+                                    <li><a href="@route('/collections/entry/'.$collection['name'])/{ entry._id }">@lang('View')</a></li>
+                                    @endif
+
+                                    @if($app->module('collections')->hasaccess($collection['name'], 'entries_delete'))
+                                    <li class="uk-nav-item-danger"><a class="uk-dropdown-close" onclick="{ parent.remove }">@lang('Delete')</a></li>
+                                    @endif
+
+                                    @if($app->module('collections')->hasaccess($collection['name'], 'entries_create'))
+                                    <li class="uk-nav-divider"></li>
+                                    <li><a class="uk-dropdown-close" onclick="{ parent.duplicateEntry }">@lang('Duplicate')</a></li>
+                                    @endif
+                                </ul>
+                            </div>
+                        </span>
                 </div>
             </div>
 
@@ -475,6 +512,8 @@
                     $this.update();
 
                     $this.checkselected();
+                }).catch(function(err){
+                    App.ui.notify(err, "danger");
                 });
 
             }.bind(this));
@@ -698,6 +737,9 @@
                 } else {
                     App.ui.notify("Could not duplicate entry", "danger");
                 }
+            }).catch(function(err){
+                console.log(err);
+                App.ui.notify(err, "danger");
             });
         }
 
