@@ -35,21 +35,24 @@ function CollectionHasFieldAccess(field) {
 
             <a><i class="uk-icon-bars"></i> {{ htmlspecialchars(@$collection['label'] ? $collection['label']:$collection['name'], ENT_QUOTES, 'UTF-8') }}</a>
 
-            @if($app->module('collections')->hasaccess($collection['name'], 'collection_edit'))
             <div class="uk-dropdown">
-                <ul class="uk-nav uk-nav-dropdown">
-                    <li class="uk-nav-header">@lang('Actions')</li>
+            <ul class="uk-nav uk-nav-dropdown">
+            <li class="uk-nav-header">@lang('Actions')</li>
+                @if($app->module('collections')->hasaccess($collection['name'], 'collection_edit'))
                     <li><a href="@route('/collections/collection/'.$collection['name'])">@lang('Edit')</a></li>
-                    @if($app->module('collections')->hasaccess($collection['name'], 'entries_delete'))
+                @endif
+                @if($app->module('collections')->hasaccess($collection['name'], 'entries_delete'))
                     <li class="uk-nav-divider"></li>
                     <li><a href="@route('/collections/trash/collection/'.$collection['name'])">@lang('Trash')</a></li>
-                    @endif
-                    <li class="uk-nav-divider"></li>
-                    <li class="uk-text-truncate"><a href="@route('/collections/export/'.$collection['name'])" download="{{ $collection['name'] }}.collection.json">@lang('Export entries')</a></li>
+                @endif
+                <li class="uk-nav-divider"></li>
+                <li class="uk-text-truncate"><a href="@route('/collections/export/'.$collection['name'])/json" download="{{ $collection['name'] }}.collection.json">@lang('Export JSON')</a></li>
+                <li class="uk-text-truncate"><a href="@route('/collections/export/'.$collection['name'])/xlsx" download="{{ $collection['name'] }}.collection.xlsx">@lang('Export XLSX')</a></li>
+                @if($app->module('collections')->hasaccess($collection['name'], 'collection_edit'))
                     <li class="uk-text-truncate"><a href="@route('/collections/import/collection/'.$collection['name'])">@lang('Import entries')</a></li>
+                @endif
                 </ul>
             </div>
-            @endif
 
         </li>
     </ul>

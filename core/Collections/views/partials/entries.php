@@ -140,7 +140,14 @@ span[entry-custom-actions] > a {
         <div class="uk-margin-top" show="{ !loading && (entries.length || filter || tabIndexGroup > -1) }">
         <div  if="{  groups.length > 1 }" class="uk-tab-center">
             <ul class="uk-tab">
-                <li each="{group,idx in groups}" class="{ tabIndexGroup == idx && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="{idx}">{ App.i18n.get(group.name) }</a></li>
+                <li each="{group,idx in groups}" onclick="{ toggleTab }" data-tab="{idx}" class="{ tabIndexGroup == idx && 'uk-active'}">
+                    <a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="{idx}">
+                        <span onclick="{ toggleTab }" data-tab="{idx}">{ App.i18n.get(group.name) }</span>
+                        <span  onclick="{ toggleTab }" data-tab="{idx}" class="uk-badge" if="{ group.count > 0 }" riot-style="position: relative;top: -5px;left: -5px;font-size: 8px !important;line-height: 3px;padding: 5px;border-radius: 6px;margin: 0;font-weight: normal;{ (metaColor) ? ('background-color:'+metaColor) : '' }">
+                            { group.count }
+                        </span>
+                    </a>
+                </li>
             </ul>
         </div>
 <div class="uk-text-xlarge uk-text-muted uk-viewport-height-1-3 uk-flex uk-flex-center uk-flex-middle" if="{ !entries.length && (filter || tabIndexGroup > -1) && !loading }">
@@ -385,17 +392,23 @@ span[entry-custom-actions] > a {
     @endif
 
     <script type="view/script">
-
+        THIS = this;
         var $this = this, $root = App.$(this.root);
-
         this.collection = {{ json_encode($collection) }};
+        this.metaColor =  this.collection.meta && this.collection.meta.color;
         this.loading    = true;
         this.count      = 0;
         this.page       = 1;
         this.limit      = 20;
         this.entries    = [];
         this.fieldsidx  = {};
-        this.groups     = !Array.isArray(this.collection.groups) ? [] : this.collection.groups.map(g=>g.value).filter(g=>g.enabled);
+        this.groups     = ([
+            @foreach(null != $collection["groups"] && is_array($collection["groups"]) ? $collection["groups"] : [] as $group)
+                @if(null != $group["value"] && !empty($group["value"]) && null != $group["value"]["enabled"] && null != $group["value"]["filter"] && $group["value"]["enabled"] && !empty($group["value"]["filter"]))
+                    {{ json_encode(array_merge($group["value"],["count"=> $app->module('collections')->count($collection['name'], $group["value"]['filter'])]), JSON_PRETTY_PRINT) }},
+                @endif
+            @endforeach 
+        ]).filter(g=>g.enabled);
         this.tabIndexGroup   = this.groups.length ? 0 : -1;
         this.imageField = null;
         this.languages  = App.$data.languages;
@@ -520,10 +533,15 @@ span[entry-custom-actions] > a {
         }
 
         toggleTab(e) {
+            e.preventDefault();
             var tabIndexGroup = e.target.getAttribute('data-tab');
-            if(this.tabIndexGroup != tabIndexGroup && this.groups[this.tabIndexGroup]){
+            this._toggleTab(tabIndexGroup);
+        }
+        _toggleTab(tabIndexGroup){
+            if(this.tabIndexGroup != tabIndexGroup && this.groups[tabIndexGroup]){
                 this.tabIndexGroup = tabIndexGroup;
                 sessionStorage.getItem(this.collection.name+"-tabIndexGroup", this.tabIndexGroup);
+                this.page       = 1;
                 this.load();
                 this.update();
             }
@@ -572,7 +590,7 @@ span[entry-custom-actions] > a {
             }.bind(this));
 
         }
-
+        
         load(initial) {
 
             var options = { sort:this.sort };

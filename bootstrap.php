@@ -26,7 +26,10 @@ if (!class_exists('Lime\\App')) {
     include(__DIR__.'/lib/LimeExtra/App.php');
     include(__DIR__.'/lib/LimeExtra/Controller.php');
 }
-
+/**
+ * Clean URL remove multiple slash
+ */
+$_SERVER['REQUEST_URI'] = preg_replace("#/+#","/", $_SERVER['REQUEST_URI']);
 /*
  * Autoload from lib folder (PSR-0)
  */

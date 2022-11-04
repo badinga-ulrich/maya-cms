@@ -11,13 +11,15 @@
 namespace Collections\Controller;
 
 
-class Admin extends \Maya\AuthController {
+class Admin extends \Maya\AuthController
+{
 
 
-    public function index() {
+    public function index()
+    {
 
         $_collections = $this->module('collections')->getCollectionsInGroup(null, false);
-        $collections  = [];
+        $collections = [];
 
         foreach ($_collections as $collection => $meta) {
 
@@ -39,18 +41,22 @@ class Admin extends \Maya\AuthController {
         }
 
         // sort collections
-        usort($collections, function($a, $b) {
-            return mb_strtolower($a['label']) <=> mb_strtolower($b['label']);
-        });
+        usort(
+            $collections, function ($a, $b) {
+                return mb_strtolower($a['label']) <=> mb_strtolower($b['label']);
+            }
+        );
 
         return $this->render('collections:views/index.php', compact('collections'));
     }
 
-    public function _collections() {
+    public function _collections()
+    {
         return $this->module('collections')->collections();
     }
 
-    public function _find() {
+    public function _find()
+    {
 
         if ($this->param('collection') && $this->param('options')) {
             return $this->module('collections')->find($this->param('collection'), $this->param('options'));
@@ -59,7 +65,8 @@ class Admin extends \Maya\AuthController {
         return false;
     }
 
-    public function collection($name = null) {
+    public function collection($name = null)
+    {
 
         if ($name && !$this->module('collections')->hasaccess($name, 'collection_edit')) {
             return $this->helper('admin')->denyRequest();
@@ -73,7 +80,7 @@ class Admin extends \Maya\AuthController {
             'name' => '',
             'label' => '',
             'color' => '',
-            'fields'=>[],
+            'fields' => [],
             'acl' => new \ArrayObject,
             'sortable' => false,
             'sort' => [
@@ -119,14 +126,15 @@ class Admin extends \Maya\AuthController {
 
         foreach ($this->app->helper('acl')->getGroups() as $group => $superAdmin) {
 
-            if (!$superAdmin) $aclgroups[] = $group;
+            if (!$superAdmin)
+                $aclgroups[] = $group;
         }
 
-        
+
         // rules
         $rules = [
             'create' => !$name || !$this->app->path("#storage:collections/rules/{$name}.create.php") ? $defaultPHP : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.create.php"),
-            'read'   => !$name || !$this->app->path("#storage:collections/rules/{$name}.read.php") ? $defaultPHP : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.read.php"),
+            'read' => !$name || !$this->app->path("#storage:collections/rules/{$name}.read.php") ? $defaultPHP : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.read.php"),
             'update' => !$name || !$this->app->path("#storage:collections/rules/{$name}.update.php") ? $defaultPHP : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.update.php"),
             'delete' => !$name || !$this->app->path("#storage:collections/rules/{$name}.delete.php") ? $defaultPHP : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.delete.php"),
         ];
@@ -166,11 +174,12 @@ class Admin extends \Maya\AuthController {
         return $this->render('collections:views/collection.php', compact('collection', 'templates', 'aclgroups', 'rules', 'views'));
     }
 
-    public function save_collection() {
+    public function save_collection()
+    {
 
         $collection = $this->param('collection');
-        $rules      = $this->param('rules', null);
-        $views      = $this->param('views', null);
+        $rules = $this->param('rules', null);
+        $views = $this->param('views', null);
 
         if (!$collection) {
             return false;
@@ -199,7 +208,8 @@ class Admin extends \Maya\AuthController {
         return $collection;
     }
 
-    public function entries($collection) {
+    public function entries($collection)
+    {
 
         if (!$this->module('collections')->hasaccess($collection, 'entries_view')) {
             return $this->helper('admin')->denyRequest();
@@ -211,18 +221,21 @@ class Admin extends \Maya\AuthController {
             return false;
         }
 
-        $collection = array_merge([
-            'sortable' => false,
-            'sort' => [
-                'column' => '_created',
-                'dir' => -1,
+        $collection = array_merge(
+            [
+                'sortable' => false,
+                'sort' => [
+                    'column' => '_created',
+                    'dir' => -1,
+                ],
+                'color' => '',
+                'icon' => '',
+                'description' => ''
             ],
-            'color' => '',
-            'icon' => '',
-            'description' => ''
-        ], $collection);
+            $collection
+        );
 
-        $context = _check_collection_rule($collection, 'read', ['options' => ['filter'=>[]]]);
+        $context = _check_collection_rule($collection, 'read', ['options' => ['filter' => []]]);
 
         $this->app->helper('admin')->favicon = [
             'path' => 'collections:icon.svg',
@@ -239,14 +252,15 @@ class Admin extends \Maya\AuthController {
 
         $view = 'collections:views/entries.php';
 
-        if ($override = $this->app->path('#config:collections/'.$collection['name'].'/views/entries.php')) {
+        if ($override = $this->app->path('#config:collections/' . $collection['name'] . '/views/entries.php')) {
             $view = $override;
         }
 
         return $this->render($view, compact('collection'));
     }
 
-    public function entry($collection, $id = null) {
+    public function entry($collection, $id = null)
+    {
 
         if ($id && !$this->module('collections')->hasaccess($collection, 'entries_view')) {
             return $this->helper('admin')->denyRequest();
@@ -256,24 +270,27 @@ class Admin extends \Maya\AuthController {
             return $this->helper('admin')->denyRequest();
         }
 
-        $collection    = $this->module('collections')->collection($collection);
-        $entry         = new \ArrayObject([]);
+        $collection = $this->module('collections')->collection($collection);
+        $entry = new \ArrayObject([]);
         $excludeFields = [];
 
         if (!$collection) {
             return false;
         }
 
-        $collection = array_merge([
-            'sortable' => false,
-            'sort' => [
-                'column' => '_created',
-                'dir' => -1,
+        $collection = array_merge(
+            [
+                'sortable' => false,
+                'sort' => [
+                    'column' => '_created',
+                    'dir' => -1,
+                ],
+                'color' => '',
+                'icon' => '',
+                'description' => ''
             ],
-            'color' => '',
-            'icon' => '',
-            'description' => ''
-        ], $collection);
+            $collection
+        );
 
         $this->app->helper('admin')->favicon = [
             'path' => 'collections:icon.svg',
@@ -296,24 +313,26 @@ class Admin extends \Maya\AuthController {
             $this->app->helper('admin')->lockResourceId($id);
         }
 
-        $context = _check_collection_rule($collection, 'read', ['options' => ['filter'=>[]]]);
+        $context = _check_collection_rule($collection, 'read', ['options' => ['filter' => []]]);
 
         if ($context && isset($context->options['fields'])) {
             foreach ($context->options['fields'] as $field => $include) {
-                if(!$include) $excludeFields[] = $field;
+                if (!$include)
+                    $excludeFields[] = $field;
             }
         }
 
         $view = 'collections:views/entry.php';
 
-        if ($override = $this->app->path('#config:collections/'.$collection['name'].'/views/entry.php')) {
+        if ($override = $this->app->path('#config:collections/' . $collection['name'] . '/views/entry.php')) {
             $view = $override;
         }
 
         return $this->render($view, compact('collection', 'entry', 'excludeFields'));
     }
 
-    public function save_entry($collection) {
+    public function save_entry($collection)
+    {
 
         $collection = $this->module('collections')->collection($collection);
 
@@ -352,7 +371,7 @@ class Admin extends \Maya\AuthController {
             $revision = true;
 
             if ($collection['sortable']) {
-                 $entry['_o'] = $this->app->storage->count("collections/{$collection['_id']}", ['_pid' => ['$exists' => false]]);
+                $entry['_o'] = $this->app->storage->count("collections/{$collection['_id']}", ['_pid' => ['$exists' => false]]);
             }
 
         }
@@ -360,8 +379,8 @@ class Admin extends \Maya\AuthController {
         try {
             $entry = $this->module('collections')->save($collection['name'], $entry, ['revision' => $revision]);
 
-        } catch(\Throwable $e) {
-            
+        } catch (\Throwable $e) {
+
             $this->app->stop(['error' => $e->getMessage()], 412);
         }
         $this->app->helper('admin')->lockResourceId($entry['_id']);
@@ -369,7 +388,8 @@ class Admin extends \Maya\AuthController {
         return $entry;
     }
 
-    public function delete_entries($collection) {
+    public function delete_entries($collection)
+    {
 
         \session_write_close();
 
@@ -415,21 +435,24 @@ class Admin extends \Maya\AuthController {
         return true;
     }
 
-    public function update_order($collection) {
+    public function update_order($collection)
+    {
 
         \session_write_close();
 
         $collection = $this->module('collections')->collection($collection);
         $entries = $this->param('entries');
 
-        if (!$collection) return false;
-        if (!$entries) return false;
+        if (!$collection)
+            return false;
+        if (!$entries)
+            return false;
 
         $_collectionId = $collection['_id'];
 
         if (is_array($entries) && count($entries)) {
 
-            foreach($entries as $entry) {
+            foreach ($entries as $entry) {
                 $this->app->storage->save("collections/{$_collectionId}", $entry);
             }
         }
@@ -440,59 +463,308 @@ class Admin extends \Maya\AuthController {
         return $entries;
     }
 
-    public function export($collection) {
+    public function export($collection = null, $type = 'json')
+    {
 
-        \session_write_close();
-
-        if (!$this->app->module("maya")->hasaccess('collections', 'manage')) {
-            return false;
+        if (!$this->app->module('collections')->hasaccess($collection, 'entries_view')) {
+            return $this->helper('admin')->denyRequest();
+            ;
         }
+
+        $collection = $collection ? $collection : $this->app->param('collection', '');
+        $options = $this->app->param('options', []);
+        $type = $this->app->param('type', $type);
 
         $collection = $this->module('collections')->collection($collection);
 
-        if (!$collection) return false;
+        if (!$collection)
+            return false;
 
-        if (!$this->module('collections')->hasaccess($collection['name'], 'entries_view')) {
-            return $this->helper('admin')->denyRequest();
+        $this->app->trigger('collections.export.before', [$collection, &$type, &$options]);
+
+        switch ($type) {
+            case 'json':
+                return $this->json($collection, $options);
+                break;
+            case 'csv':
+                return $this->sheet($collection, $options, 'Csv');
+                break;
+            case 'ods':
+                return $this->sheet($collection, $options, 'Ods');
+                break;
+            case 'xls':
+                return $this->sheet($collection, $options, 'Xls');
+                break;
+            case 'xlsx':
+                return $this->sheet($collection, $options, 'Xlsx');
+                break;
+            default:
+                return false;
         }
 
-        $entries = $this->module('collections')->find($collection['name']);
-
-        return json_encode($entries, JSON_PRETTY_PRINT);
     }
 
+    protected function json($collection, $options)
+    {
 
-    public function tree() {
+        $entries = $this->module('collections')->find($collection['name'], $options);
+
+        $this->app->response->mime = 'json';
+
+        return \json_encode($entries, JSON_PRETTY_PRINT);
+
+    } // end of json()
+    protected function setValue(&$entry, $field) {
+        if ($field['type'] == "repeater" && isset($entry[$field['name']])) {
+            $entriesValues = [];
+            foreach ($entry[$field['name']] as $key => $subEntry) {
+                $subEntry["field"]["name"] = "value";
+                $this->setValue($subEntry, $subEntry["field"]);
+                $entriesValues[$key] = $subEntry["value"];
+            }
+            $entry[$field['name']] = implode("\r\n\r\n", $entriesValues);
+        } else if ($field['type'] == "set" && isset($entry[$field['name']], $field['options'], $field['options']["fields"])) {
+            try {
+                //code...
+                $subFields = $field['options']["fields"];
+                $entriesValues = [];
+                foreach ($subFields as $key => $subField) {
+                    if (isset($entry[$field['name']][$subField["name"]])) {
+                        $this->setValue($entry[$field['name']], $subField);
+                        $entriesValues[isset($subField['label']) && !empty(($subField['label'])) ? $subField['label'] : $subField['name']] = $entry[$field['name']][$subField["name"]];
+                    }
+                }
+                $entry[$field['name']] = implode(
+                    "\r\n",
+                    array_map(
+                        function ($k, $v) {
+                            return strtoupper($k) . " : " . $v;
+                        },
+                        array_keys($entriesValues),
+                        array_values($entriesValues)
+                    )
+                );
+            } catch (\Throwable $th) {
+                //throw $th;
+                $entry[$field['name']] = "ERROR " . $th;
+            }
+        } else if ($field['type'] == "image" && isset($entry[$field['name']]) && is_array($entry[$field['name']]) && isset($entry[$field['name']]["path"])) {
+            $entry[$field['name']] = $this->routeFullUrl($entry[$field['name']]["path"]);
+        } else if (
+               in_array($field['type'], ["collectionlink", "collectionlinkselect"]) 
+            && isset($entry[$field['name']], $entry[$field['name']]["display"]) 
+            && is_array($entry[$field['name']]) 
+        ) {
+            $entry[$field['name']] = $entry[$field['name']]["display"];
+        } else if (isset($entry[$field['name']], $entry[$field['name']]["display"]) && is_array($entry[$field['name']]) && is_scalar($entry[$field['name']]["display"])) {
+            $entry[$field['name']] = $entry[$field['name']]["display"];
+        } else if (isset($entry[$field['name']]) && is_array($entry[$field['name']])) {
+            $entry[$field['name']] = json_encode($entry[$field['name']]);
+        }
+    }
+    protected function sheet($collection = [], $_options = [], $type = 'Ods')
+    {
+
+        $user = $this->app->module('maya')->getUser();
+
+        $filename = $collection['name'];
+
+        $description = "Exported Maya Collection";
+
+
+        if (!empty($collection['description']))
+            $description .= "\r\n\r\n" . $collection['description'];
+
+        if (!empty($_options))
+            $description .= "\r\n\r\nUser defined filter options:\r\n";
+
+        foreach ($_options as $key => $val) {
+            $description .= $key . ': ' . json_encode($val) . "\r\n";
+        }
+
+        $opts = [
+            'title' => !empty($collection['label']) ? $collection['label'] : $collection['name'],
+            'creator' => !empty($user['name']) ? $user['name'] : $user['user'],
+            'description' => trim($description),
+        ];
+        $spreadsheet = new \SheetExport($opts);
+        $groups = isset($collection["groups"]) && !empty($collection["groups"]) ? $collection["groups"] : [];
+        $groups = array_filter(
+            array_map(function($group){
+                return isset($group["value"], $group["value"]["name"]) ? $group["value"] : (
+                    isset($group["name"]) ? $group : []
+                );
+            },$groups), function ($group) {
+                return isset($group['enabled']) && $group['enabled'];
+            }
+        );
+        if(empty($groups)){
+            $groups = array(
+                array(
+                    'name' => $this("i18n")->get("Entries"),
+                    'filter' =>array(),
+                    'enabled' => true,
+                    'sheetPrefix' => ""
+                ),
+            );
+        }
+        if (!function_exists('str_contains')) {
+            function str_contains(string $haystack, string $needle)
+            {
+                return empty($needle) || strpos($haystack, $needle) !== false;
+            }
+        }
+        function clone_array($arr) {
+            $clone = array();
+            foreach($arr as $k => $v) {
+                if(is_array($v)) $clone[$k] = clone_array($v); //If a subarray
+                else if(is_object($v)) $clone[$k] = clone $v; //If an object
+                else $clone[$k] = $v; //Other primitive types.
+            }
+            return $clone;
+        }
+        // build sheets from group
+        foreach ($groups as $groupIndex => $group) {
+            try{
+                // set sheet title
+                try {
+                    $sheet = $spreadsheet->spreadsheet->getSheet($groupIndex);
+                } catch (\Throwable $th) {
+                    try {
+                        //code...
+                        $sheet = $spreadsheet->spreadsheet->createSheet($groupIndex);
+                    } catch (\Throwable $th) {
+                        //throw $th;
+                    }
+                    //throw $th;
+                }
+            }catch (\Throwable $th) {
+
+            }
+            $spreadsheet->spreadsheet->setActiveSheetIndex($groupIndex);
+            $sheet->setTitle((isset($group["sheetPrefix"]) ? $group["sheetPrefix"] : ($groupIndex.". ")).$group["name"]);
+            $options = clone_array($_options);
+            $collectionFields = clone_array($collection['fields']);
+            // quick fix to enable _id and other meta fields
+            $meta = $options['meta'] ?? null;
+            if (!$meta)
+                $meta = ['_id'];
+            if ($meta === true || $meta === 1 || $meta === '1') {
+                $meta = [
+                    '_id',
+                    '_created',
+                    '_modified',
+                    '_mby',
+                    '_by',
+                ];
+            }
+            $options["filter"] = isset($options["filter"]) ? [
+                "\$and" => [
+                    $options["filter"],
+                    $group["filter"],
+                ]
+            ] : $group["filter"];
+            if(empty($options["filter"]) || (isset($options["filter"]['$and'],$options["filter"]['$and'][0], $options["filter"]['$and'][1]) && empty($options["filter"]['$and'][0]) && empty($options["filter"]['$and'][1])) ){
+                unset($options["filter"]);
+            }else if((isset($options["filter"]['$and'],$options["filter"]['$and'][0], $options["filter"]['$and'][1]) && empty($options["filter"]['$and'][0]) && !empty($options["filter"]['$and'][1])) ){
+                $options["filter"] = $options["filter"]['$and'][1];
+            }else if((isset($options["filter"]['$and'],$options["filter"]['$and'][0], $options["filter"]['$and'][1]) && !empty($options["filter"]['$and'][0]) && empty($options["filter"]['$and'][1])) ){
+                $options["filter"] = $options["filter"]['$and'][0];
+            }
+            foreach ($meta as $metaField) {
+                $collectionFields[] = ['name' => $metaField];
+            }
+
+            // table headers
+            $c = 'A';
+            $r = '1';
+            foreach ($collectionFields as $field) {
+
+                if (empty($options['fields']) ||
+                    !$this->module('collections')
+                        ->is_filtered_out(
+                            $field['name'], $options['fields'],
+                            '_id'
+                        )
+                ) {
+                    // $spreadsheet->setCellValue($c.$r, $field['name']);
+                    $spreadsheet->setCellValue($c . $r, strtoupper(isset($field['label']) && !empty(($field['label'])) ? $field['label'] : $field['name']));
+                    $c++;
+                }
+            }
+
+            // table contents
+            $entries = $this->module('collections')->find($collection['name'], $options);
+
+            $c = 'A';
+            $r = '2';
+            
+            foreach ($entries as $entry) {
+
+                foreach ($collectionFields as $field) {
+
+                    $this->setValue($entry, $field);
+
+                    if (empty($options['fields']) ||
+                        !$this->module('collections')
+                            ->is_filtered_out(
+                                $field['name'], $options['fields'],
+                                '_id'
+                            )
+                    ) {
+                        $spreadsheet->setCellValue($c . $r, $entry[$field['name']] ?? '');
+                        $c++;
+                    }
+                }
+                $c = 'A';
+                $r++;
+            }
+        }
+        // write file and exit
+        $spreadsheet->write($type, $filename);
+
+    } // end of sheet()
+
+
+
+    public function tree()
+    {
 
         \session_write_close();
 
         $collection = $this->app->param('collection');
 
-        if (!$collection) return false;
+        if (!$collection)
+            return false;
 
         $items = $this->app->module('collections')->find($collection);
 
         if (count($items)) {
 
-            $items = $this->helper('utils')->buildTree($items, [
-                'parent_id_column_name' => '_pid',
-                'children_key_name' => 'children',
-                'id_column_name' => '_id',
-    			'sort_column_name' => '_o'
-            ]);
+            $items = $this->helper('utils')->buildTree(
+                $items,
+                [
+                    'parent_id_column_name' => '_pid',
+                    'children_key_name' => 'children',
+                    'id_column_name' => '_id',
+                    'sort_column_name' => '_o'
+                ]
+            );
         }
 
         return $items;
     }
 
-    public function find() {
+    public function find()
+    {
 
         \session_write_close();
 
         $collection = $this->app->param('collection');
-        $options    = $this->app->param('options');
+        $options = $this->app->param('options');
 
-        if (!$collection) return false;
+        if (!$collection)
+            return false;
 
         $collection = $this->app->module('collections')->collection($collection);
         if (isset($options['filter']) && is_string($options['filter'])) {
@@ -503,7 +775,8 @@ class Admin extends \Maya\AuthController {
 
                 try {
                     $filter = json5_decode($options['filter'], true);
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
             }
 
             if (!$filter) {
@@ -521,20 +794,21 @@ class Admin extends \Maya\AuthController {
 
                 try {
                     $filter = json5_decode($options['search'], true);
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
             }
 
             if (!$filter) {
                 $filter = $this->_filter($options['search'], $collection, $options['lang'] ?? null);
             }
-            if(isset($options['filter']) && is_array($options['filter'])){
+            if (isset($options['filter']) && is_array($options['filter'])) {
                 $options['filter'] = [
                     '$and' => [
-                        $filter, 
+                        $filter,
                         $options['filter']
                     ]
                 ];
-            }else {
+            } else {
                 $options['filter'] = $filter;
             }
         }
@@ -545,7 +819,7 @@ class Admin extends \Maya\AuthController {
 
         $count = $this->app->module('collections')->count($collection['name'], isset($options['filter']) ? $options['filter'] : []);
         $pages = isset($options['limit']) ? ceil($count / $options['limit']) : 1;
-        $page  = 1;
+        $page = 1;
 
         if ($pages > 1 && isset($options['skip'])) {
             $page = ceil($options['skip'] / $options['limit']) + 1;
@@ -555,7 +829,8 @@ class Admin extends \Maya\AuthController {
     }
 
 
-    public function revisions($collection, $id) {
+    public function revisions($collection, $id)
+    {
 
         if (!$this->module('collections')->hasaccess($collection, 'entries_edit')) {
             return $this->helper('admin')->denyRequest();
@@ -582,7 +857,7 @@ class Admin extends \Maya\AuthController {
 
             if (isset($field['acl']) && is_array($field['acl']) && count($field['acl'])) {
 
-                if (!( in_array($user['group'], $field['acl']) || in_array($user['_id'], $field['acl']) )) {
+                if (!(in_array($user['group'], $field['acl']) || in_array($user['_id'], $field['acl']))) {
                     continue;
                 }
             }
@@ -591,7 +866,8 @@ class Admin extends \Maya\AuthController {
 
             if (isset($field['localize']) && $field['localize']) {
                 foreach ($languages as $key => $val) {
-                    if (is_numeric($key)) $key = $val;
+                    if (is_numeric($key))
+                        $key = $val;
                     $allowedFields[] = "{$field['name']}_{$key}";
                 }
             }
@@ -602,13 +878,14 @@ class Admin extends \Maya\AuthController {
         return $this->render('collections:views/revisions.php', compact('collection', 'entry', 'revisions', 'allowedFields'));
     }
 
-    protected function _filter($filter, $collection, $lang = null) {
+    protected function _filter($filter, $collection, $lang = null)
+    {
 
-        $isMongoLite  = ($this->app->storage->type == 'mongolite');
+        $isMongoLite = ($this->app->storage->type == 'mongolite');
 
-        $allowedtypes = ['text','longtext','boolean','select','html','wysiwyg','markdown','code'];
-        $criterias    = [];
-        $_filter      = null;
+        $allowedtypes = ['text', 'longtext', 'boolean', 'select', 'html', 'wysiwyg', 'markdown', 'code'];
+        $criterias = [];
+        $_filter = null;
 
         $this->app->trigger('collections.admin._filter.before', [$collection, &$filter, &$allowedtypes, &$criterias]);
 
@@ -626,31 +903,31 @@ class Admin extends \Maya\AuthController {
                 $criteria[$name] = ['$regex' => $filter];
 
                 if (!$isMongoLite) {
-                  $criteria[$name]['$options'] = 'i';
+                    $criteria[$name]['$options'] = 'i';
                 }
 
                 $criterias[] = $criteria;
             }
 
-            if ($field['type']=='collectionlink' || $field['type']=='collectionlinkselect') {
+            if ($field['type'] == 'collectionlink' || $field['type'] == 'collectionlinkselect') {
 
                 $criteria = [];
-                $criteria[$name.'.display'] = ['$regex' => $filter];
+                $criteria[$name . '.display'] = ['$regex' => $filter];
 
                 if (!$isMongoLite) {
-                  $criteria[$name.'.display']['$options'] = 'i';
+                    $criteria[$name . '.display']['$options'] = 'i';
                 }
 
                 $criterias[] = $criteria;
             }
 
-            if ($field['type']=='location') {
+            if ($field['type'] == 'location') {
 
                 $criteria = [];
-                $criteria[$name.'.address'] = ['$regex' => $filter];
+                $criteria[$name . '.address'] = ['$regex' => $filter];
 
                 if (!$isMongoLite) {
-                  $criteria[$name.'.address']['$options'] = 'i';
+                    $criteria[$name . '.address']['$options'] = 'i';
                 }
 
                 $criterias[] = $criteria;

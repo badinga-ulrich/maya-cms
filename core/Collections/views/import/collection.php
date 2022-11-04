@@ -17,7 +17,8 @@
                     <li><a href="@route('/collections/trash/collection/'.$collection['name'])">@lang('Trash')</a></li>
                     @endif
                     <li class="uk-nav-divider"></li>
-                    <li class="uk-text-truncate"><a href="@route('/collections/export/'.$collection['name'])" download="{{ $collection['name'] }}.collection.json">@lang('Export entries')</a></li>
+                    <li class="uk-text-truncate"><a href="@route('/collections/export/'.$collection['name'])" download="{{ $collection['name'] }}.collection.json">@lang('Export JSON')</a></li>
+                    <li class="uk-text-truncate"><a href="@route('/collections/export/'.$collection['name'])/xlsx" download="{{ $collection['name'] }}.collection.xlsx">@lang('Export XLSX')</a></li>
                 </ul>
             </div>
 

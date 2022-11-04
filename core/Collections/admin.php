@@ -8,7 +8,16 @@
  * file that was distributed with this source code.
  */
 
+
 $app->on('admin.init', function() {
+
+    // Autoload from lib folder (PSR-0)
+    spl_autoload_register(function($class){
+        $class_path = __DIR__.'/lib/'.str_replace('\\', '/', $class).'.php';
+        if(file_exists($class_path)) return include_once($class_path);
+    });
+    include(__DIR__.'/lib/vendor/autoload.php');
+
 
     $this->helper('admin')->addAssets('collections:assets/field-collectionlink.tag');
     $this->helper('admin')->addAssets('collections:assets/field-collectionlinkselect.tag');

@@ -1,0 +1,39 @@
+{
+    "name":        "pear/html_common2",
+    "description": "Abstract base class for HTML classes (PHP5 port of HTML_Common package).",
+    "type":        "library",
+    "keywords":    ["html", "element", "attribute", "pear"],
+    "homepage":    "https://pear.php.net/package/HTML_Common2",
+    "license":     "BSD-3-Clause",
+
+    "authors": [
+        {
+            "email": "avb@php.net",
+            "name": "Alexey Borzov",
+            "role": "Lead"
+        },
+        {
+            "email": "thesaur@php.net",
+            "name": "Klaus Guenther",
+            "role": "Lead"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/pear/HTML_Common2/issues",
+        "source": "https://github.com/pear/HTML_Common2"
+    },
+    "require": {
+        "php": ">=5.6.0"
+    },
+    "require-dev": {
+        "yoast/phpunit-polyfills": "^1.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "HTML_Common2": ""
+        }
+    },
+    "autoload-dev": {
+        "classmap": ["tests/"]
+    }
+}

@@ -324,6 +324,26 @@ $this->module('collections')->extend([
 
         return $entries[0] ?? null;
     },
+    'is_filtered_out' => function($field_name, $fields = null, $primary_key = '') {
+        // select all
+        if (!$fields)
+            return false;
+        // one filter is set to true - don't select any other fields
+        if (in_array(true, $fields)) {
+            if (isset($fields[$field_name]) && $fields[$field_name] == true)
+                return false;
+            // return primary_key, too if not explicitly set to false
+            if ($field_name == $primary_key && ( !isset($fields[$primary_key]) || $fields[$primary_key] == true))
+                return false;
+            return true;
+        }
+        else {
+            if (!isset($fields[$field_name]))
+                return false;
+            if (isset($fields[$field_name]) && $fields[$field_name] == false)
+                return true;
+        }
+    }, 
 
     'save' => function($collection, $data, $options = []) {
 
@@ -717,6 +737,7 @@ function _check_collection_rule($collection, $rule, $_context = null) {
 
     return $context;
 }
+
 
 // ACL
 $app('acl')->addResource("collections", ['create', 'delete', 'manage']);

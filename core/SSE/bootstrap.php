@@ -16,7 +16,7 @@ $app->service('sse', function() {
 // register global events
 $app->on('maya.bootstrap', function() use($app){
     $app->module('maya')->extend([
-        "publish" => function($name, $data, $chanel = "events", $deleteOnRead = false) use ($app){
+        "publish" => function($name, $data, $channel = "events", $deleteOnRead = false) use ($app){
             $user = maya()->module('maya')->getUser();
             $data = [
                 'user' => $user ? [
@@ -26,17 +26,17 @@ $app->on('maya.bootstrap', function() use($app){
                     "group" => $user["group"],
                     "email" => $user["email"],
                 ] : null,
-                'name'=>$name,
+                'name'=> strtolower(preg_replace("/[^a-zA-Z0-9-:\.]/","",$name)),
                 'time' => time(),
                 'exp' => ($deleteOnRead ? strtotime('+1 years') /* expire in 1 year from now*/ : strtotime('+10 seconds')),
                 'data' => $data,
                 'deleteOnRead' => $deleteOnRead,
             ];
-            if($chanel &&  $name){
-                $app->sse->save($chanel, $data);
+            if($channel &&  $name){
+                $app->sse->save(strtolower($channel), $data);
             }
             // clean old events
-            maya()->sse->remove($chanel,[
+            maya()->sse->remove($channel,[
                 'exp' => [
                     '$lt' => time()
                 ]
@@ -51,13 +51,14 @@ $app->on('maya.bootstrap', function() use($app){
             $n = isset(func_get_args()[0]) && is_string(func_get_args()[0])?  func_get_args()[0] : (
                 isset(func_get_args()[0]['name']) && is_string(func_get_args()[0]['name'])?  func_get_args()[0]['name'] : '' 
             );
-            if($n && preg_match("#\{[^\}]+\}#",$name)
-            ){
+
+            if($n && preg_match("#\{[^\}]+\}#",$name)){
                 $name = @preg_replace("#\{[^\}]+\}#",$n,$name);
-            }else {
-                $name = "";
+                $n = isset(func_get_args()[1],func_get_args()[1]['_id']) ?  func_get_args()[1]['_id'] : '';
             }
-            $app->module('maya')->publish($name, func_get_args());
+            // $app->module('maya')->publish($name, func_get_args());
+            // ignore data when hadle default event
+            $app->module('maya')->publish($name, $n);
         });
     }
 });

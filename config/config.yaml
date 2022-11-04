@@ -1,5 +1,10 @@
-app.name: Maya CMS
 # Maya settings
+
+app.name: Maya CMS
+
+i18n: fr
+
 languages:
   default: Francais
   en: English
+
