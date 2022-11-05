@@ -255,7 +255,7 @@
                 
                 clearInterval(idle);
 
-            }, 60000);
+            }, 6000);
 
             $this.update();
         });

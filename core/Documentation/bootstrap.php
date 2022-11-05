@@ -25,9 +25,9 @@ $app->module('documentation')->extend([
     // like jQuery and Bootstrap.
     (new DocsViewer(
       $manager, 
-      '/core/'.basename(__DIR__)."/vendor"
+      maya()->routeUrl('/core/'.basename(__DIR__)."/vendor")
     ))
-        ->setPathUrl("/documentation")
+        ->setPathUrl( maya()->routeUrl("/documentation"))
         ->setRootDir(__DIR__)
         ->setRootPath('/core/'.basename(__DIR__))
         ->setTitle('Documentation')

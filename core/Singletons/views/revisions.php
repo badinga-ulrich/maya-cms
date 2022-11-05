@@ -207,7 +207,7 @@
 
             App.ui.confirm('Are you sure?', function() {
 
-                App.request('/maya/utils/revisionsRemoveAll', {oid:$this.revisions[0]._oid}).then(function(){
+                App.request('/admin/utils/revisionsRemoveAll', {oid:$this.revisions[0]._oid}).then(function(){
                     $this.revisions = [];
                     $this.update();
                 });
@@ -220,7 +220,7 @@
 
             App.ui.confirm('Are you sure?', function() {
 
-                App.request('/maya/utils/revisionsRemove', {rid:$this.active._id}).then(function(){
+                App.request('/admin/utils/revisionsRemove', {rid:$this.active._id}).then(function(){
                     $this.active = null;
                     $this.revisions.splice(idx, 1);
                     $this.update();

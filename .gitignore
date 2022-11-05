@@ -29,6 +29,7 @@ package-lock.json
 !/storage/*/.htaccess
 !/addons/index.html
 !/config
+!/hosts
 !/config/*
 !/storage/assets
 !/storage/assets/*

@@ -113,7 +113,7 @@
                     }
                     
                     if (!url.match(/\.(svg|ico)$/i)) {
-                        url = App.route(`/maya/utils/thumb_url?src=${url}&w=${opts.width}&h=${opts.height}&m=${mode}&re=1`);
+                        url = App.route(`/admin/utils/thumb_url?src=${url}&w=${opts.width}&h=${opts.height}&m=${mode}&re=1`);
                     }
                     
                     resolve(url);

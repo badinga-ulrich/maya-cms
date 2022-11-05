@@ -175,7 +175,7 @@
             
             this.on('mount', function() {
                 
-                App.request('/maya/utils/getCacheSize').then(function(rsp) {
+                App.request('/admin/utils/getCacheSize').then(function(rsp) {
                     
                     $this.cacheSize = rsp.size ? rsp.size_pretty : 0;
                     $this.update();
@@ -198,7 +198,7 @@
 
             startJobsRunner() {
                 this.JobsRunnerLoading = true;
-                App.request('/maya/utils/startJobRunner').then(function(rsp) {
+                App.request('/admin/utils/startJobRunner').then(function(rsp) {
 
                     if (!rsp.running) {
                         App.ui.notify('Runner failed to start', 'danger');
@@ -212,7 +212,7 @@
 
             restartJobsRunner() {
                 this.JobsRunnerLoading = true;
-                App.request('/maya/utils/restartJobRunner').then(function(rsp) {
+                App.request('/admin/utils/restartJobRunner').then(function(rsp) {
 
                     if (!rsp.running) {
                         App.ui.notify('Runner failed to start', 'danger');
@@ -226,7 +226,7 @@
 
             stopJobsRunner() {
                 this.JobsRunnerLoading = true;
-                App.request('/maya/utils/stopJobRunner').then(function(rsp) {
+                App.request('/admin/utils/stopJobRunner').then(function(rsp) {
                     
                     if (rsp.running) {
                         App.ui.notify('Runner failed to terminate', 'danger');

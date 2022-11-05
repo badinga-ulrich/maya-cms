@@ -59,33 +59,85 @@ if (strpos($MAYA_DIR, $MAYA_DOCS_ROOT)!==0 && isset($_SERVER['SCRIPT_NAME'])) {
     $MAYA_DOCS_ROOT = str_replace(dirname(str_replace(DIRECTORY_SEPARATOR, '/', $_SERVER['SCRIPT_NAME'])), '', $MAYA_DIR);
 }
 
-$MAYA_BASE        = trim(str_replace($MAYA_DOCS_ROOT, '', $MAYA_DIR), "/");
-$MAYA_BASE_URL    = strlen($MAYA_BASE) ? "/{$MAYA_BASE}": $MAYA_BASE;
-$MAYA_BASE_ROUTE  = $MAYA_BASE_URL;
+
+$MAYA_BASE          = trim(str_replace($MAYA_DOCS_ROOT, '', $MAYA_DIR), "/");
+$MAYA_BASE_URL      = strlen($MAYA_BASE) ? "/{$MAYA_BASE}": $MAYA_BASE;
+$MAYA_BASE_ROUTE    = $MAYA_BASE_URL;
+$MAYA_HOSTS_CONFIG_FILE  = $MAYA_DIR."/.htconfig";
+$MAYA_HOST          = file_exists($MAYA_HOSTS_CONFIG_FILE) && is_readable($MAYA_HOSTS_CONFIG_FILE) ? @strtolower(preg_replace("/(127.0.0.\d|0.0.0.0)/","localhost", isset($_SERVER['HTTP_HOST']) && !empty($_SERVER['HTTP_HOST']) ?  preg_replace("/:\d+\$/", "",$_SERVER["HTTP_HOST"]) : $_SERVER['SERVER_NAME'])) : "";
+$MAYA_HOST_CONFIG  = [];
+if($MAYA_HOST){
+    // check
+    $hosts_configs = Spyc::YAMLLoad($MAYA_HOSTS_CONFIG_FILE);
+    if(isset($hosts_configs[$MAYA_HOST]) && is_array($hosts_configs[$MAYA_HOST]))
+        $MAYA_HOST_CONFIG = $hosts_configs[$MAYA_HOST];
+    if(isset($hosts_configs["default"]) && is_array($hosts_configs["default"])){
+        $MAYA_HOST_CONFIG = array_replace_recursive($hosts_configs["default"], $MAYA_HOST_CONFIG);
+    }
+    if(isset($MAYA_HOST_CONFIG["isRoot"])){
+        if($MAYA_HOST_CONFIG["isRoot"]){
+            $MAYA_HOST = "";
+        }
+        unset($MAYA_HOST_CONFIG["isRoot"]);
+    }
+}
 
 /*
  * SYSTEM DEFINES
  */
+if (!defined('DEF_RIGHTS'))                  define('DEF_RIGHTS'          , 0700);
 if (!defined('MAYA_DIR'))                    define('MAYA_DIR'            , $MAYA_DIR);
-if (!defined('MAYA_ADMIN'))                  define('MAYA_ADMIN'          , 0);
-if (!defined('MAYA_DOCS_ROOT'))              define('MAYA_DOCS_ROOT'      , $MAYA_DOCS_ROOT);
 if (!defined('MAYA_ENV_ROOT'))               define('MAYA_ENV_ROOT'       , MAYA_DIR);
+if (!defined('MAYA_STORAGE_DIR'))            define('MAYA_STORAGE_DIR'    , MAYA_ENV_ROOT.'/storage');
+if (!defined('MAYA_ADMIN'))                  define('MAYA_ADMIN'          , 0);
+if (!defined('MAYA_HOST'))                   define('MAYA_HOST'           , $MAYA_HOST ? $MAYA_HOST : "");
+if (!defined('MAYA_HOST_CONFIG'))            define('MAYA_HOST_CONFIG'    , $MAYA_HOST_CONFIG);
+if (!defined('MAYA_HOST_FOLDER'))            define('MAYA_HOST_FOLDER'    , MAYA_STORAGE_DIR.($MAYA_HOST ? ("/".MAYA_HOST) : ""));
+if (!defined('MAYA_DOCS_ROOT'))              define('MAYA_DOCS_ROOT'      , $MAYA_DOCS_ROOT);
 if (!defined('MAYA_BASE_URL'))               define('MAYA_BASE_URL'       , $MAYA_BASE_URL);
 if (!defined('MAYA_API_REQUEST'))            define('MAYA_API_REQUEST'    , MAYA_ADMIN && strpos($_SERVER['REQUEST_URI'], MAYA_BASE_URL.'/api/')!==false ? 1:0);
 if (!defined('MAYA_SITE_DIR'))               define('MAYA_SITE_DIR'       , MAYA_ENV_ROOT == MAYA_DIR ?  ($MAYA_DIR == MAYA_DOCS_ROOT ? MAYA_DIR : dirname(MAYA_DIR)) :  MAYA_ENV_ROOT);
-if (!defined('MAYA_CONFIG_DIR'))             define('MAYA_CONFIG_DIR'     , MAYA_ENV_ROOT.'/config');
 if (!defined('MAYA_BASE_ROUTE'))             define('MAYA_BASE_ROUTE'     , $MAYA_BASE_ROUTE);
-if (!defined('MAYA_STORAGE_FOLDER'))         define('MAYA_STORAGE_FOLDER' , MAYA_ENV_ROOT.'/storage');
+if (!defined('MAYA_CONFIG_DIR'))             define('MAYA_CONFIG_DIR'     , (MAYA_HOST ? MAYA_HOST_FOLDER : MAYA_ENV_ROOT).'/config');
+if (!defined('MAYA_STORAGE_FOLDER'))         define('MAYA_STORAGE_FOLDER' , MAYA_HOST_FOLDER);
+if (!defined('MAYA_PUBLIC_STORAGE_FOLDER'))  define('MAYA_PUBLIC_STORAGE_FOLDER' , MAYA_HOST_FOLDER);
 if (!defined('MAYA_ADMIN_CP'))               define('MAYA_ADMIN_CP'       , MAYA_ADMIN && !MAYA_API_REQUEST ? 1 : 0);
-if (!defined('MAYA_PUBLIC_STORAGE_FOLDER'))  define('MAYA_PUBLIC_STORAGE_FOLDER' , MAYA_ENV_ROOT.'/storage');
+
+if (!file_exists(dirname(MAYA_HOST_FOLDER))){
+    if(!mkdir(dirname(MAYA_HOST_FOLDER), DEF_RIGHTS)) {
+        die('Failed to create host...');
+    }
+    chmod(dirname(MAYA_HOST_FOLDER),DEF_RIGHTS);
+}
+
+if (!file_exists(MAYA_HOST_FOLDER)){
+    if(!mkdir(MAYA_HOST_FOLDER, DEF_RIGHTS)) {
+        die('Failed to create host...');
+    }
+    chmod(MAYA_HOST_FOLDER,DEF_RIGHTS);
+}
 
 if (!defined('MAYA_CONFIG_PATH')) {
     $_configpath = MAYA_CONFIG_DIR.'/config.'.(file_exists(MAYA_CONFIG_DIR.'/config.php') ? 'php':'yaml');
+    if (!file_exists(dirname($_configpath)))
+        if(!mkdir(dirname($_configpath), DEF_RIGHTS, true)) {
+            die('Failed to create config...');
+        }else{
+            $config = <<<YAML
+# Maya settings
+app.name: Maya CMS
+i18n: fr
+languages:
+    default: Francais
+    en: English
+YAML;
+            file_put_contents($_configpath, $config);
+            chmod($_configpath, DEF_RIGHTS);
+        }
     define('MAYA_CONFIG_PATH', $_configpath);
 }
 
 function maya($module = null) {
-
     static $app;
 
     if (!$app) {
@@ -104,12 +156,11 @@ function maya($module = null) {
         if (file_exists(MAYA_CONFIG_PATH)) {
             $customConfig = preg_match('/\.yaml$/', MAYA_CONFIG_PATH) ? Spyc::YAMLLoad(MAYA_CONFIG_PATH) : include(MAYA_CONFIG_PATH);
         }
-
         // load config
         $config = array_replace_recursive([
 
-            'debug'        => preg_match('/(localhost|::1|\.local)$/', @$_SERVER['SERVER_NAME']),
-            'app.name'     => 'Maya',
+            'debug'        => preg_match('/(127.0.0.1|0.0.0.0|localhost|::1|\.local)$/', @$_SERVER['SERVER_NAME']),
+            'app.name'     => 'Maya CMS',
             'base_url'     => MAYA_BASE_URL,
             'base_route'   => MAYA_BASE_ROUTE,
             'docs_root'    => MAYA_DOCS_ROOT,
@@ -117,8 +168,9 @@ function maya($module = null) {
             'session.init' => (MAYA_ADMIN && !MAYA_API_REQUEST) ? true : false,
             'sec-key'      => $secKey,
             'i18n'         => 'en',
-            'database'     => ['server' => 'mongolite://'.(MAYA_STORAGE_FOLDER.'/data'), 'options' => ['db' => 'mayadb'], 'driverOptions' => [] ],
-            'memory'       => ['server' => 'redislite://'.(MAYA_STORAGE_FOLDER.'/data/maya.memory.sqlite'), 'options' => [] ],
+            'database'     => ['server' => 'mongolite://'.(MAYA_STORAGE_FOLDER.'/data'), 'options' => ['db' => 'database'], 'driverOptions' => [] ],
+            'memory'       => ['server' => 'mongolite://'.(MAYA_STORAGE_FOLDER.'/data'), 'options' => ['db'=>'memory'], 'driverOptions' => [] ],
+            // 'memory'       => ['server' => 'redislite://'.(MAYA_STORAGE_FOLDER.'/data/maya.memory.sqlite'), 'options' => [] ],
 
             'paths'         => [
                 '#root'     => MAYA_DIR,
@@ -129,9 +181,9 @@ function maya($module = null) {
                 '#tmp'      => MAYA_STORAGE_FOLDER.'/tmp',
                 '#thumbs'   => MAYA_PUBLIC_STORAGE_FOLDER.'/thumbs',
                 '#uploads'  => MAYA_PUBLIC_STORAGE_FOLDER.'/uploads',
+                '#addons'   => (MAYA_HOST ? MAYA_STORAGE_FOLDER : MAYA_ENV_ROOT).'/addons',
+                '#public'   => (MAYA_HOST ? MAYA_STORAGE_FOLDER : MAYA_ENV_ROOT).'/public',
                 '#modules'  => MAYA_DIR.'/modules',
-                '#addons'   => MAYA_ENV_ROOT.'/addons',
-                '#public'   => MAYA_ENV_ROOT.'/public',
                 '#config'   => MAYA_CONFIG_DIR,
                 'assets'    => MAYA_DIR.'/assets',
                 'site'      => MAYA_SITE_DIR
@@ -139,8 +191,17 @@ function maya($module = null) {
 
             'filestorage' => [],
 
-        ], is_array($customConfig) ? $customConfig : []);
-
+        ], array_replace_recursive(is_array($customConfig) ? $customConfig : [], MAYA_HOST_CONFIG));
+        foreach ($config["paths"] as $key => $path) {
+            if(preg_match("#^".preg_quote(MAYA_STORAGE_FOLDER)."#",$path)){
+                if (!file_exists($path)){
+                    if(!mkdir($path, DEF_RIGHTS)) {
+                        die('Failed to create '.basename($path).'...');
+                    }
+                    chmod($path,DEF_RIGHTS);
+                }
+            }
+        }
         // make sure Maya module is not disabled
         if (isset($config['modules.disabled']) && in_array('Maya', $config['modules.disabled'])) {
             array_splice($config['modules.disabled'], array_search('Maya', $config['modules.disabled']), 1);
@@ -156,6 +217,7 @@ function maya($module = null) {
         }
         // nosql storage
         $app->service('storage', function() use($config) {
+            
             $client = new MongoHybrid\Client($config['database']['server'], $config['database']['options'], $config['database']['driverOptions']);
             return $client;
         });
@@ -229,7 +291,7 @@ function maya($module = null) {
 
         // key-value storage
         $app->service('memory', function() use($config) {
-            $client = new SimpleStorage\Client($config['memory']['server'], $config['memory']['options']);
+            $client = new MongoHybrid\Client($config['memory']['server'], $config['memory']['options'], $config['memory']['driverOptions']);
             return $client;
         });
 

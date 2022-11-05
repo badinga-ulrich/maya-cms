@@ -100,7 +100,7 @@
                                 <ul class="uk-grid uk-grid-small uk-grid-width-1-2 uk-grid-width-medium-1-4 uk-text-center">
 
                                     <li class="uk-grid-margin">
-                                        <a class="uk-display-block uk-panel-card-hover uk-panel-box uk-panel-space {{ ($app['route'] == '/maya/dashboard') ? 'uk-bg-primary uk-contrast':'' }}" href="@route('/maya/dashboard')">
+                                        <a class="uk-display-block uk-panel-card-hover uk-panel-box uk-panel-space {{ ($app['route'] == '/admin/dashboard') ? 'uk-bg-primary uk-contrast':'' }}" href="@route('/admin/dashboard')">
                                             <div class="uk-svg-adjust">
                                                 <img class="uk-margin-small-right inherit-color" src="@base('assets:app/media/icons/dashboard.svg')" width="40" height="40" data-uk-svg alt="assets" />
                                             </div>
@@ -116,17 +116,18 @@
                                             <div class="uk-text-truncate uk-text-small uk-margin-small-top">@lang('Assets')</div>
                                         </a>
                                     </li>
-
-                                    @hasaccess?('maya', 'finder')
-                                    <li class="uk-grid-margin">
-                                        <a class="uk-display-block uk-panel-card-hover uk-panel-box uk-panel-space {{ (strpos($app['route'],'/finder')===0) ? 'uk-bg-primary uk-contrast':'' }}" href="@route('/finder')">
-                                            <div class="uk-svg-adjust">
-                                                <img class="uk-margin-small-right inherit-color" src="@base('assets:app/media/icons/finder.svg')" width="40" height="40" data-uk-svg alt="assets" /> 
-                                            </div>
-                                            <div class="uk-text-truncate uk-text-small uk-margin-small-top">@lang('Finder')</div>
-                                        </a>
-                                    </li>
-                                    @end
+                                    @if($app->retrieve('finder', true))
+                                        @hasaccess?('maya', 'finder')
+                                        <li class="uk-grid-margin">
+                                            <a class="uk-display-block uk-panel-card-hover uk-panel-box uk-panel-space {{ (strpos($app['route'],'/finder')===0) ? 'uk-bg-primary uk-contrast':'' }}" href="@route('/finder')">
+                                                <div class="uk-svg-adjust">
+                                                    <img class="uk-margin-small-right inherit-color" src="@base('assets:app/media/icons/finder.svg')" width="40" height="40" data-uk-svg alt="assets" /> 
+                                                </div>
+                                                <div class="uk-text-truncate uk-text-small uk-margin-small-top">@lang('Finder')</div>
+                                            </a>
+                                        </li>
+                                        @end
+                                    @endif
 
                                     @hasaccess?('maya', 'settings')
                                     <li class="uk-grid-margin">

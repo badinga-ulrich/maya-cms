@@ -193,7 +193,7 @@
                 if (!$this.singleton._id) return;
                 Maya.lockResource($this.singleton._id);
                 clearInterval(idle);
-            }, 60000);
+            }, 6000);
         });
 
         this.on('update', function(){

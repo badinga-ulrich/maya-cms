@@ -94,8 +94,8 @@ $app['app.assets.base'] = $assets;
  * register routes
  */
 
-$app->bindClass('Maya\\Controller\\Utils', 'maya/utils');
-$app->bindClass('Maya\\Controller\\Base', 'maya');
+$app->bindClass('Maya\\Controller\\Utils', 'admin/utils');
+$app->bindClass('Maya\\Controller\\Base', 'admin');
 $app->bindClass('Maya\\Controller\\Settings', 'settings');
 $app->bindClass('Maya\\Controller\\Accounts', 'accounts');
 $app->bindClass('Maya\\Controller\\Auth', 'auth');
@@ -199,7 +199,7 @@ $app->on('admin.init', function() {
         $this["user"] = $this->module('maya')->getUser();
         return $this->view('maya:views/base/finder.php');
 
-    }, $this->module('maya')->hasaccess('maya', 'finder'));
+    }, $this->retrieve('finder', true) && $this->module('maya')->hasaccess('maya', 'finder'));
 
 }, 0);
 

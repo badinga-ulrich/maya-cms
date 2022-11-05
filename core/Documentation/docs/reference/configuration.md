@@ -10,6 +10,10 @@ app.name: 'My Project X'
 session.name: mysession
 sec-key: xxxxx-SiteSecKeyPleaseChangeMe-xxxxx
 site_url: 'https://mydomain.com'
+
+# disable finder 
+finder: false
+
 # cockpit default language
 i18n: de
 

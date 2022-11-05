@@ -1,0 +1,17 @@
+default: # default
+  app.name: Maya CMS
+  i18n: en
+  languages:
+      default: Francais
+      en: English
+
+localhost:
+  app.name: Localhost
+  finder : false
+
+maya-cms.lo:
+  isRoot : true
+
+academics.ream.lo:
+  app.name: Ream Academics
+  finder : false

@@ -139,7 +139,7 @@
                 });
             });
 
-            App.request('/maya/savedashboard',{widgets:data}).then(function(){
+            App.request('/admin/savedashboard',{widgets:data}).then(function(){
 
             });
         });

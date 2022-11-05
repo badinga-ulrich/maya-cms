@@ -450,7 +450,9 @@ class Media extends \Maya\AuthController {
     public function savebookmarks() {
 
         if ($bookmarks = $this->param('bookmarks', false)) {
-            $this->memory->set('mediamanager.bookmarks.'.$this->user['_id'], $bookmarks);
+            $this->memory->save('mediamanager.bookmarks',array_merge($bookmarks,[
+                '_id' => $this->user['_id']
+            ]));
         }
 
         return json_encode($bookmarks);
@@ -458,7 +460,7 @@ class Media extends \Maya\AuthController {
 
     public function loadbookmarks() {
 
-        return json_encode($this->app->memory->get('mediamanager.bookmarks.'.$this->user['_id'], ['folders'=>[], 'files'=>[]]));
+        return json_encode($this->app->memory->findOneById('mediamanager.bookmarks',$this->user['_id'], ['folders'=>[], 'files'=>[]]));
     }
 
     protected function _getPathParameter() {

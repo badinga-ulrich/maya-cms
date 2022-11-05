@@ -427,7 +427,7 @@
                 if (!$this.collection._id) return;
                 Maya.lockResource($this.collection._id);
                 clearInterval(idle);
-            }, 60000);
+            }, 6000);
         });
 
         setDefaultView(e) {

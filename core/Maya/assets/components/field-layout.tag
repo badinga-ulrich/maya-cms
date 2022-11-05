@@ -611,7 +611,7 @@
             if (url.match(/^(http\:|https\:|\/\/)/) && !(url.includes(ASSETS_URL) || url.includes(SITE_URL))) {
                 src = url;
             } else {
-                src = App.route('/maya/utils/thumb_url?src='+url+'&w=50&h=50&m=bestFit&re=1');
+                src = App.route('/admin/utils/thumb_url?src='+url+'&w=50&h=50&m=bestFit&re=1');
             }
 
             if (src.match(/\.(svg|ico)$/i)) {

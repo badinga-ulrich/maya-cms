@@ -285,7 +285,7 @@
 
             if (v.mime.match(/^image\//)) {
 
-                var url = App.route('/maya/utils/thumb_url?src=' + (ASSETS_URL + v.path) + '&w=30&h=30&re=1');
+                var url = App.route('/admin/utils/thumb_url?src=' + (ASSETS_URL + v.path) + '&w=30&h=30&re=1');
                 return '<img src="' + url + '" loading="lazy" width="20" height="20">';
             }
 

@@ -1540,7 +1540,7 @@ riot.tag2('cp-revisions-info', '<span> <span class="uk-icon-spinner uk-icon-spin
 
             this.loading = true;
 
-            App.request('/maya/utils/revisionsCount', {id:opts.rid}, 'text').then(function(cnt){
+            App.request('/admin/utils/revisionsCount', {id:opts.rid}, 'text').then(function(cnt){
 
                 if (!App.Utils.isNumeric(cnt)) {
                     cnt = 'n/a';
@@ -1563,7 +1563,7 @@ riot.tag2('cp-search', '<div ref="autocomplete" class="uk-autocomplete uk-form u
             var txtSearch = App.$("input[type='text']", this.refs.autocomplete);
 
             UIkit.autocomplete(this.refs.autocomplete, {
-                source: App.route('/maya/search'),
+                source: App.route('/admin/search'),
                 template: '<ul class="uk-nav uk-nav-autocomplete uk-autocomplete-results">{{~items}}<li data-value="" data-url="{{$item.url}}"><a href="{{$item.url}}"><i class="uk-icon-{{ ($item.icon || "cube") }}"></i> {{$item.title}}</a></li>{{/items}}</ul>'
             });
 
@@ -1701,7 +1701,7 @@ riot.tag2('cp-thumbnail', '<div class="uk-position-relative"> <i ref="spinner" c
                     }
 
                     if (!url.match(/\.(svg|ico)$/i)) {
-                        url = App.route(`/maya/utils/thumb_url?src=${url}&w=${opts.width}&h=${opts.height}&m=${mode}&re=1`);
+                        url = App.route(`/admin/utils/thumb_url?src=${url}&w=${opts.width}&h=${opts.height}&m=${mode}&re=1`);
                     }
 
                     resolve(url);
@@ -3292,7 +3292,7 @@ riot.tag2('field-layout', '<div class="uk-sortable layout-components {!items.len
             if (url.match(/^(http\:|https\:|\/\/)/) && !(url.includes(ASSETS_URL) || url.includes(SITE_URL))) {
                 src = url;
             } else {
-                src = App.route('/maya/utils/thumb_url?src='+url+'&w=50&h=50&m=bestFit&re=1');
+                src = App.route('/admin/utils/thumb_url?src='+url+'&w=50&h=50&m=bestFit&re=1');
             }
 
             if (src.match(/\.(svg|ico)$/i)) {

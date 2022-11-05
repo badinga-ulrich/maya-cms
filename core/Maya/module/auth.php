@@ -73,7 +73,9 @@ $this->module('maya')->extend([
     },
 
     'logout' => function() use($app) {
-        $app->trigger('maya.account.logout', [$this->getUser()]);
+        $user = $this->getUser();
+        $app->helper('admin')->unlockUserAllResources($user);
+        $app->trigger('maya.account.logout', []);
         $app('session')->delete('maya.app.auth');
 
         // prevent session fixation attacks

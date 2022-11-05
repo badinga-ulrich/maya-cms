@@ -30,7 +30,7 @@
 
             this.loading = true;
 
-            App.request('/maya/utils/revisionsCount', {id:opts.rid}, 'text').then(function(cnt){
+            App.request('/admin/utils/revisionsCount', {id:opts.rid}, 'text').then(function(cnt){
                 
                 if (!App.Utils.isNumeric(cnt)) {
                     cnt = 'n/a';

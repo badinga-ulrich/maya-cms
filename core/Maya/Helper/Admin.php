@@ -99,7 +99,7 @@ class Admin extends \Lime\Helper {
                 'maxUploadSize' => $this->app->helper('utils')->getMaxUploadSize(),
 
                 'acl' => [
-                    'finder' => $this->app->module('maya')->hasaccess('maya', 'finder')
+                    'finder' => $this->app->retrieve('finder', true) && $this->app->module('maya')->hasaccess('maya', 'finder')
                 ]
             ]
         ]);
@@ -201,13 +201,10 @@ class Admin extends \Lime\Helper {
     }
 
     public function isResourceLocked($resourceId, $ttl = null) {
-
         $ttl  = $ttl ?? 300;
-        $key  = "locked:{$resourceId}";
-        $meta = $this->app->memory->get($key, false);
-
+        $meta = $this->app->memory->findOneById("locked",$resourceId);
         if ($meta && ($meta['time'] + $ttl) < time()) {
-            $this->app->memory->del($key);
+            $this->app->memory->removeById("locked",$resourceId);
             $meta = false;
         }
 
@@ -241,7 +238,6 @@ class Admin extends \Lime\Helper {
             return false;
         }
 
-        $key  = "locked:{$resourceId}";
         $user = $user ?? $this->app->module('maya')->getUser();
 
         if (!$user) {
@@ -249,22 +245,33 @@ class Admin extends \Lime\Helper {
         }
 
         $meta = [
-            'rid'  => $resourceId,
+            '_id'  => $resourceId,
             'user' => ['_id' => $user['_id'], 'name' => $user['name'], 'user' => $user['user'], 'email' => $user['email']],
             'sid'  => md5(session_id()),
             'time' => time()
         ];
+        $locked = boolval($this->app->memory->count("locked", ['_id'=> $resourceId, "user._id"=>['$ne'=>$user['_id']]]));
+        if($locked) return $locked;
+        $locked = boolval($this->app->memory->count("locked", ['_id'=> $resourceId, "user._id"=>$user['_id']]));
 
-        $this->app->memory->set($key, $meta);
-
+        if(!$locked){
+            $this->app->memory->insert("locked", $meta);
+        }
         return true;
     }
 
     public function unlockResourceId($resourceId) {
-
-        $key = "locked:{$resourceId}";
-        $this->app->memory->del($key);
+        $this->app->memory->removeById("locked",$resourceId);
         return true;
+    }
+    public function unlockUserAllResources($user = null) {
+        $user = $user ?? $this->app->module('maya')->getUser();
+
+        if (!$user) {
+            return false;
+        }
+        $ret = $this->app->memory->remove("locked",["user._id"=>['$ne'=>$user['_id']]]);
+        return boolval($ret);
     }
 
     public function denyRequest() {

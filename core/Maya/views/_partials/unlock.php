@@ -13,7 +13,7 @@
 
             var resourceId = '{{ $resourceId }}';
 
-            App.request('/maya/utils/unlockResourceId/'+resourceId, {}).then(function(data) {
+            App.request('/admin/utils/unlockResourceId/'+resourceId, {}).then(function(data) {
                 
                 if (data && data.success) {
                     location.reload();

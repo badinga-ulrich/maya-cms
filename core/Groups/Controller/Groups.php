@@ -52,7 +52,7 @@ class Groups extends \Maya\AuthController {
             'vars' => self::getGroupVars(),
             'admin' => false,
             'maya' => [
-                'finder' => true,
+                'finder' => $this->retrieve('finder', true),
                 'rest' => true,
                 'backend' => true
             ]
@@ -112,14 +112,15 @@ class Groups extends \Maya\AuthController {
     }
     
     public static function getGroupVars() : array {
-        return [
+        return array_merge( maya()->retrieve('finder', true) ? [
             'finder.path'               =>'/storage',
             'finder.allowed_uploads'    => '*',
+        ] : [], [
             'assets.path'               => '/storage/assets',
             'assets.allowed_uploads'    => '*',
             'assets.max_upload_size'    => '0',
             'media.path'                => '/storage/media'
-        ];
+        ],);
     }
     
     public static function getGroupVarInfo($key) {

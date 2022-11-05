@@ -78,9 +78,9 @@ class MongoLite {
         return $this->getCollection($collection)->findOne($filter, $projection);
     }
 
-    public function findOneById($collection, $id){
-
-        return $this->getCollection($collection)->findOne(['_id' => $id]);
+    public function findOneById($collection, $id, $default=null){
+        $ret = $this->getCollection($collection)->findOne(['_id' => $id]);
+        return $ret ? $ret : $default;
     }
 
     public function find($collection, $options = []){
@@ -117,6 +117,10 @@ class MongoLite {
 
     public function remove($collection, $filter=[]) {
         return $this->getCollection($collection)->remove($filter);
+    }
+
+    public function removeById($collection, $id) {
+        return $this->getCollection($collection)->remove(['_id' => $id]);
     }
 
     public function removeField($collection, $field, $filter = []) {

@@ -11,7 +11,7 @@
 namespace Maya\Controller;
 
 class Utils extends \Maya\AuthController {
-
+    
     public function thumb_url() {
 
         \session_write_close(); // improve concurrency loading
@@ -121,7 +121,6 @@ class Utils extends \Maya\AuthController {
     }
 
     public function lockResourceId($resourceId) {
-
         $lockedMeta = $this->app->helper('admin')->isResourceLocked($resourceId);
 
         if ($lockedMeta) {

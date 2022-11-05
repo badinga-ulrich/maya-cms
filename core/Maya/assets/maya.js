@@ -23,7 +23,7 @@
 
             if (!Array.isArray(args)) args = [args];
 
-            var req = App.request('/maya/call/' + module + '/' + method, { args: args, acl: acl });
+            var req = App.request('/admin/call/' + module + '/' + method, { args: args, acl: acl });
 
             // catch any error
             req.catch(function () {
@@ -152,24 +152,22 @@
         },
 
         lockResource: function (resourceId, catchCallback) {
-
             catchCallback = catchCallback || function () {
                 App.ui.notify('This resource is locked!', 'danger');
             };
 
             var idle = setInterval(function () {
-                App.request('/maya/utils/lockResourceId/' + resourceId, {}).catch(catchCallback);
-            }, 60000);
-
+                App.request('/admin/utils/lockResourceId/' + resourceId, {}).catch(catchCallback);
+            }, 6000);
             // unlock resource
             window.addEventListener('beforeunload', function (event) {
 
                 clearInterval(idle);
 
                 if (navigator.sendBeacon) {
-                    navigator.sendBeacon(App.route('/maya/utils/unlockResourceIdByCurrentUser/' + resourceId));
+                    navigator.sendBeacon(App.route('/admin/utils/unlockResourceIdByCurrentUser/' + resourceId));
                 } else {
-                    App.request('/maya/utils/unlockResourceIdByCurrentUser/' + resourceId, {});
+                    App.request('/admin/utils/unlockResourceIdByCurrentUser/' + resourceId, {});
                 }
             });
         }

@@ -192,7 +192,7 @@
                 if (!$this.page._id) return;
                 Maya.lockResource($this.page._id);
                 clearInterval(idle);
-            }, 60000);
+            }, 6000);
         });
 
         this.on('update', function(){

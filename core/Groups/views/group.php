@@ -145,9 +145,11 @@ use Maya\Controller\Groups;
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.maya.groups" label="@lang('Groups')"></field-boolean>
             </div>
+            @if($app->retrieve('finder', true))
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.maya.finder" label="@lang('Finder')"></field-boolean>
             </div>
+            @endif
             <div class="uk-margin-small-top">
                 <field-boolean bind="group.maya.settings" label="@lang('Settings')"></field-boolean>
             </div>
