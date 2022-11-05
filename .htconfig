@@ -5,6 +5,10 @@ default: # default
       default: Francais
       en: English
 
+neiba.test:
+  app.name: Neiba Admin
+  finder : false
+
 localhost:
   app.name: Localhost
   finder : false
