@@ -10,7 +10,6 @@
 composer.lock
 package-lock.json
 composer.json
-package.json
 /lib/**/doc/*
 /lib/**/docs/*
 /lib/**/example/*
