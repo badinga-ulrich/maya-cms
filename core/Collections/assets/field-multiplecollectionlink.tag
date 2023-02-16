@@ -53,7 +53,7 @@
             { App.i18n.get('Nothing linked yet') }. { App.i18n.get('Create link to') }: <a class="field-multiplecollectionlink" each="{collection, index in collections}" title="{ App.i18n.get('Add collection') }" data-uk-tooltip="pos:'bottom'" onclick="{ () => showDialog(index) }">{ collection.label || collection.name }</a>
         </div>
 
-        <div class="uk-alert" if="{link && link.length}">
+        <div class="uk-alert" if="{(link && link.length) && !(itemLinked && (!opts.limit || opts.limit && opts.limit == 1))}">
             { App.i18n.get('Create link to') }: <a class="field-multiplecollectionlink" each="{collection, index in collections}" title="{ App.i18n.get('Add collection') }" data-uk-tooltip="pos:'bottom'" onclick="{ () => showDialog(index) }">{ collection.label || collection.name }</a>
         </div>
 
@@ -66,7 +66,7 @@
                             <div class="uk-flex-item-1 uk-flex-item-sortable">{ l.display } ({ l.link })</div>
                             <div>
                                 <a target="_blank" href="{ App.base_url }/collections/entry/{ l.link }/{ l._id }" title="{ App.i18n.get('Edit entry') }" data-uk-tooltip="pos:'bottom'"><i class="uk-icon-link"></i></a>
-                                <a class="uk-margin-small-left uk-text-danger uk-item-link" title="{ App.i18n.get('Remove entry') }" data-uk-tooltip="pos:'bottom'" onclick="{ removeListItem }"><i class="uk-icon-trash-o"></i></a>
+                                <a show="{!(itemLinked && l._id == itemLinked._id )}" class="uk-margin-small-left uk-text-danger uk-item-link" title="{ App.i18n.get('Remove entry') }" data-uk-tooltip="pos:'bottom'" onclick="{ removeListItem }"><i class="uk-icon-trash-o"></i></a>
                             </div>
                         </div>
                     </li>
@@ -78,12 +78,12 @@
                             <div class="uk-flex-item-1">{ l.display } ({ l.link })</div>
                             <div>
                                 <a target="_blank" href="{ App.base_url }/collections/entry/{ l.link }/{ l._id }" title="{ App.i18n.get('Edit entry') }" data-uk-tooltip="pos:'bottom'"><i class="uk-icon-link"></i></a>
-                                <a class="uk-margin-small-left uk-text-danger uk-item-link" title="{ App.i18n.get('Remove entry') }" data-uk-tooltip="pos:'bottom'" onclick="{ removeListItem }"><i class="uk-icon-trash-o"></i></a>
+                                <a show="{!(itemLinked && l._id == itemLinked._id )}" class="uk-margin-small-left uk-text-danger uk-item-link" title="{ App.i18n.get('Remove entry') }" data-uk-tooltip="pos:'bottom'" onclick="{ removeListItem }"><i class="uk-icon-trash-o"></i></a>
                             </div>
                         </div>
                     </li>
                 </ul>
-                <div class="uk-panel-box-footer uk-text-small uk-padding-bottom-remove">
+                <div show="{!itemLinked}" class="uk-panel-box-footer uk-text-small uk-padding-bottom-remove">
                     <a class="uk-text-danger" onclick="{ removeItem }" title="{ App.i18n.get('Remove all entries') }" data-uk-tooltip="pos:'bottom'"><i class="uk-icon-trash-o"></i> { App.i18n.get('Reset') }</a>
                 </div>
             </div>
@@ -166,12 +166,19 @@
         this.fieldsidx  = {};
         this.fields     = {};
         this.display    = {};
+        this.itemLinked = null;
+
 
         opts.links.forEach(function(link) {
-            $this.display[link.name] = link.display;
+            $this.display[link.name || link.link] = link.display;
         });
 
         this.collections.forEach(function(collection) {
+            if(opts.itemLinked && opts.itemLinked._collectionLink == collection.name){
+                $this.itemLinked = opts.itemLinked;
+                $this.collection = collection;
+
+            }
             $this.fieldsidx[collection.name] = {};
             let collectionFields = collection.fields.filter(function(field){
                 $this.fieldsidx[collection.name][field.name] = field;
@@ -181,6 +188,13 @@
             $this.fields[collection.name] = collectionFields;
         });
 
+        if(this.itemLinked){
+            this.linkItem({
+                item : {
+                    entry : this.itemLinked
+                }
+            })
+        }
         this.update();
 
     }.bind(this);
@@ -207,7 +221,7 @@
         let links = [];
 
         opts.links.forEach(function(link) {
-            links.push(link.name);
+            links.push(link.name || link.link);
         });
 
         modal = UIkit.modal(this.refs.modal, {modal:false});
@@ -272,17 +286,17 @@
             this.link = [];
         }
 
-        if (opts.limit && opts.limit == 1) {
+        if (!opts.limit || opts.limit && opts.limit == 1) {
             this.link = entry;
         } else {
             this.link.push(entry);
+            this.link = _.uniqBy(this.link, '_id');
         }
 
 
         setTimeout(function(){
             modal.hide();
         }, 50);
-
         this.$setValue(this.link);
     }
 

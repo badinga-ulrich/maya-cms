@@ -1,5 +1,4 @@
 <field-collectionlink>
-
     <div class="uk-alert" if="{!opts.link}">
         { App.i18n.get('Collection to link not defined in the field settings') }
     </div>
@@ -27,7 +26,7 @@
                     <a class="uk-margin-small-left" href="{ App.route('/collections/entry/'+opts.link+'/'+link._id) }"><i class="uk-icon-link"></i></a>
                 </div>
 
-                <div class="uk-panel-box-footer uk-text-small uk-padding-bottom-remove">
+                <div show="{!itemLinked}" class="uk-panel-box-footer uk-text-small uk-padding-bottom-remove">
                     <a class="uk-margin-small-right" onclick="{ showDialog }"><i class="uk-icon-link"></i> { App.i18n.get('Link item') }</a>
                     <a class="uk-text-danger" onclick="{ removeItem }"><i class="uk-icon-trash-o"></i> { App.i18n.get('Remove') }</a>
                 </div>
@@ -42,7 +41,7 @@
                 <ul class="uk-list uk-list-space uk-sortable" data-uk-sortable>
                     <li each="{l,index in link}" data-idx="{ index }">
                         <div class="uk-grid uk-grid-small uk-text-small">
-                            <div><a onclick="{ removeListItem }"><i class="uk-icon-trash-o"></i></a></div>
+                            <div show="{!(itemLinked && l._id == itemLinked._id )}"><a onclick="{ removeListItem }"><i class="uk-icon-trash-o"></i></a></div>
                             <div class="uk-flex uk-flex-item-1">
                                 <span class="uk-flex-item-1">{ parent.getDisplay(l) }</span>
                                 <a class="uk-margin-small-left" href="{ App.route('/collections/entry/'+parent.opts.link+'/'+l._id) }"><i class="uk-icon-link"></i></a>
@@ -53,7 +52,7 @@
 
                 <div class="uk-panel-box-footer uk-text-small uk-padding-bottom-remove">
                     <a class="uk-margin-small-right" onclick="{ showDialog }"><i class="uk-icon-plus-circle"></i> { App.i18n.get('Item') }</a>
-                    <a class="uk-text-danger" onclick="{ removeItem }"><i class="uk-icon-trash-o"></i> { App.i18n.get('Reset') }</a>
+                    <a show="{!itemLinked}" class="uk-text-danger" onclick="{ removeItem }"><i class="uk-icon-trash-o"></i> { App.i18n.get('Reset') }</a>
                 </div>
             </div>
 
@@ -156,6 +155,7 @@
     var $this = this, modal, collections, cache = {}, _init = function(){
 
         this.error = this.collection ? false:true;
+        this.itemLinked = opts.itemLinked && opts.itemLinked._collectionLink == $this.collection.name ? opts.itemLinked : null;
 
         this.loadmore   = false;
         this.entries    = [];
@@ -167,6 +167,13 @@
 
         this.fields.push({name:'_modified', 'label':App.i18n.get('Modified')});
 
+        if(this.itemLinked){
+            this.linkItem({
+                item : {
+                    entry : this.itemLinked
+                }
+            })
+        }
         this.update();
 
     }.bind(this);
@@ -295,7 +302,7 @@
                 link: $this.collection.name,
                 display: _.get(_entry, opts.display) || typeof _entry[defaultField] === 'string' && _entry[defaultField] || 'n/a'
             };
-
+            
             $this.link.push(entry);
         });
 

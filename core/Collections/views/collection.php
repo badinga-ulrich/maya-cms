@@ -93,6 +93,7 @@
                 <ul class="uk-tab uk-margin-large-bottom">
                     <li class="{ tab=='fields' && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="fields">{ App.i18n.get('Fields') }</a></li>
                     <li class="{ tab=='auth' && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="auth">{ App.i18n.get('Permissions') }</a></li>
+                    <li class="{ tab=='hooks' && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="hooks">{ App.i18n.get('Events') }</a></li>
                     <li class="{ tab=='groups' && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="groups">{ App.i18n.get('Groups') }</a></li>
                     <li class="{ tab=='other' && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleTab }" data-tab="other">{ App.i18n.get('Other') }</a></li>
                 </ul>
@@ -152,10 +153,20 @@
                         </div>
 
                     </div>
+                </div>
 
+
+                <div class="uk-form-row" show="{tab=='hooks'}">
+                    <div class="uk-margin uk-panel-box uk-panel-card uk-form-row">
+                        <div class="uk-flex uk-flex-middle">
+                            <div class="uk-flex-item-1"><span class="uk-badge uk-badge-contrast uk-text-uppercase uk-margin-small-bottom badge-rule">@lang('Boot')</span></div>
+                            <div><field-boolean bind="collection.views.bootstrap" label="@lang('Enabled')"></field-boolean></div>
+                        </div>
+                        <field-code bind="views.bootstrap" syntax="php" if="{collection.views.bootstrap}" height="350"></field-code>
+                    </div>
                     <div class="uk-margin uk-panel-box uk-panel-card">
                         <div class="uk-flex uk-flex-middle">
-                            <div class="uk-flex-item-1"><span class="uk-badge uk-badge-success uk-text-uppercase uk-margin-small-bottom badge-rule">Create</span></div>
+                            <div class="uk-flex-item-1"><span class="uk-badge uk-badge-success uk-text-uppercase uk-margin-small-bottom badge-rule">@lang('Create')</span></div>
                             <div><field-boolean bind="collection.rules.create.enabled" label="@lang('Enabled')"></field-boolean></div>
                         </div>
                         <field-code bind="rules.create" syntax="php" if="{collection.rules.create.enabled}" height="350"></field-code>
@@ -163,7 +174,7 @@
 
                     <div class="uk-margin uk-panel-box uk-panel-card">
                         <div class="uk-flex uk-flex-middle">
-                            <div class="uk-flex-item-1"><span class="uk-badge uk-text-uppercase uk-margin-small-bottom badge-rule">Read</span></div>
+                            <div class="uk-flex-item-1"><span class="uk-badge uk-text-uppercase uk-margin-small-bottom badge-rule">@lang('Read')</span></div>
                             <div><field-boolean bind="collection.rules.read.enabled" label="@lang('Enabled')"></field-boolean></div>
                         </div>
                         <field-code bind="rules.read" syntax="php" if="{collection.rules.read.enabled}" height="350"></field-code>
@@ -171,7 +182,7 @@
 
                     <div class="uk-margin uk-panel-box uk-panel-card">
                         <div class="uk-flex uk-flex-middle">
-                            <div class="uk-flex-item-1"><span class="uk-badge uk-badge-warning uk-text-uppercase uk-margin-small-bottom badge-rule">Update</span></div>
+                            <div class="uk-flex-item-1"><span class="uk-badge uk-badge-warning uk-text-uppercase uk-margin-small-bottom badge-rule">@lang('Update')</span></div>
                             <div><field-boolean bind="collection.rules.update.enabled" label="@lang('Enabled')"></field-boolean></div>
                         </div>
                         <field-code bind="rules.update" syntax="php" if="{collection.rules.update.enabled}" height="350"></field-code>
@@ -179,7 +190,7 @@
 
                     <div class="uk-margin uk-panel-box uk-panel-card">
                         <div class="uk-flex uk-flex-middle">
-                            <div class="uk-flex-item-1"><span class="uk-badge uk-badge-danger uk-text-uppercase uk-margin-small-bottom badge-rule">Delete</span></div>
+                            <div class="uk-flex-item-1"><span class="uk-badge uk-badge-danger uk-text-uppercase uk-margin-small-bottom badge-rule">@lang('Delete')</span></div>
                             <div><field-boolean bind="collection.rules.delete.enabled" label="@lang('Enabled')"></field-boolean></div>
                         </div>
                         <field-code bind="rules.item" syntax="php" if="{collection.rules.delete.enabled}" height="350"></field-code>
@@ -221,7 +232,7 @@
                     <div class="uk-margin uk-panel-box uk-panel-card">
                         <div class="uk-clearfix uk-margin-top">
                             <div class="uk-float-left">
-                                <strong class="uk-text-small uk-text-uppercase">@lang('Item View')</strong>
+                                <strong class="uk-text-small uk-text-uppercase">@lang('Collection View')</strong>
                             </div>
                             <div class="uk-float-right">
                                 <div class="uk-button-group">
@@ -237,7 +248,7 @@
                             <div class="uk-width-medium-1-2">
                                 <div class="uk-form-icon uk-form uk-width-1-1 uk-text-muted">
                                     <i class="uk-icon-map-pin"></i>
-                                    <input class="uk-width-1-1 uk-form-large uk-text-primary" type="url" placeholder="@lang('Item Latitude')" bind="collection.map.lat"  title="Latitude">
+                                    <input class="uk-width-1-1 uk-form-large uk-text-primary" type="url" placeholder="@lang('Latitude')" bind="collection.map.lat"  title="Latitude">
                                     <label class="uk-text-small">
                                         <a target="_blank" href="#json-path-doc" data-uk-modal>
                                             <i class="uk-icon-info"></i>&nbsp;&nbsp;
@@ -249,21 +260,11 @@
                             <div class="uk-width-medium-1-2">
                                 <div class="uk-form-icon uk-form uk-width-1-1 uk-text-muted">
                                     <i class="uk-icon-map-pin"></i>
-                                    <input class="uk-width-1-1 uk-form-large uk-text-primary" type="text" placeholder="@lang('Item Longitude')" bind="collection.map.lon" title="Logitude">
+                                    <input class="uk-width-1-1 uk-form-large uk-text-primary" type="text" placeholder="@lang('Longitude')" bind="collection.map.lon" title="Logitude">
                                 </div>
                             </div>
                         </div>
-                        <field-code bind="views.item" syntax="html" if="{collection.defaultView == 'MAP' || collection.defaultView == 'CUSTOM'}" height="350"></field-code>
-                    </div>
-                    <div class="uk-margin uk-panel-box uk-panel-card uk-form-row">
-                        <div class="uk-clearfix" style="
-                            padding: 5px;
-                            padding-bottom: 14px;
-                        ">
-                            <strong class="uk-float-left uk-text-small uk-text-uppercase">@lang('Bootstrap')</strong>
-                            <div class="uk-float-right "><field-boolean bind="collection.views.bootstrap" label="@lang('Enabled')"></field-boolean></div>
-                        </div>
-                        <field-code bind="views.bootstrap" syntax="php" if="{collection.views.bootstrap}" height="350"></field-code>
+                        <field-code bind="views.item" syntax="html" if="{collection.defaultView == 'CUSTOM'}" height="350"></field-code>
                     </div>
                 </div>
             </div>

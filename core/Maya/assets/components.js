@@ -688,11 +688,10 @@ riot.tag2('cp-assets-folderselect', '<div data-uk-dropdown="mode:\'click\'"> <a 
 });
 
 riot.tag2('cp-field', '<div ref="field" data-is="{\'field-\'+opts.type}" bind="{opts.bind}"></div>', '', '', function(opts) {
-
         this.on('mount', function() {
 
             var o = opts.opts || {};
-
+            console.error(this);
             if (this.root.$value == undefined && o.default !== undefined) {
                 this.$setValue(o.default);
             }

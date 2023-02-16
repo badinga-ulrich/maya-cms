@@ -1,8 +1,7 @@
 <field-collectionlinkselect>
 
     <div if="{loading}"><i class="uk-icon-spinner uk-icon-spin"></i></div>
-
-    <select class="uk-width-1-1 {opts.cls}" if="{collection && !opts.multiple && !loading}" oninput="{selectSingleItem}">
+    <select disabled="{!!itemLinked}" class="uk-width-1-1 {opts.cls}" if="{collection && !opts.multiple && !loading}" oninput="{selectSingleItem}">
         <option value=""></option>
         <optgroup each="{group in Object.keys(groups).sort()}" label="{group}">
             <option each="{ option,idx in parent.groups[group] }" value="{ option._id }" selected="{ isSelected(option._id) }">{ option.display }</option>
@@ -45,6 +44,7 @@
         this.options = null;
         this.groups = {};
         this.idx = {};
+        this.itemLinked = null;
 
         this.on('mount', function() {
 
@@ -57,6 +57,7 @@
                     $this.update();
                     return;
                 }
+                $this.itemLinked = opts.itemLinked && opts.itemLinked._collectionLink == $this.collection.name ? opts.itemLinked : null; 
 
                 var options = {};
 
@@ -103,9 +104,26 @@
 
                     });
 
+                    if($this.itemLinked){
+                        if(opts.multiple)
+                            $this.toggleMultipleItem({
+                                item : {
+                                    option : {
+                                        _id : $this.itemLinked._id
+                                    }
+                                }
+                            });
+                        else
+                            $this.selectSingleItem({
+                                target : {
+                                    value : $this.itemLinked._id
+                                }
+                            });
+                    }
                     $this.loading = false;
                     $this.update();
                 })
+
             });
         })
 

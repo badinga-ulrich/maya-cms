@@ -269,6 +269,7 @@ class Admin extends \Maya\AuthController
         if (!$id && !$this->module('collections')->hasaccess($collection, 'entries_create')) {
             return $this->helper('admin')->denyRequest();
         }
+        $canEdit = $this->app->module('collections')->hasaccess($collection, 'entries_edit');
 
         $collection = $this->module('collections')->collection($collection);
         $entry = new \ArrayObject([]);
@@ -305,12 +306,13 @@ class Admin extends \Maya\AuthController
             if (!$entry) {
                 return maya()->helper('admin')->denyRequest();
             }
-
-            if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($id, $meta)) {
-                return $this->render('collections:views/locked.php', compact('meta', 'collection', 'entry'));
+            if($canEdit){
+                if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($id, $meta)) {
+                    return $this->render('collections:views/locked.php', compact('meta', 'collection', 'entry'));
+                }
+                
+                $this->app->helper('admin')->lockResourceId($id);
             }
-
-            $this->app->helper('admin')->lockResourceId($id);
         }
 
         $context = _check_collection_rule($collection, 'read', ['options' => ['filter' => []]]);
@@ -321,14 +323,58 @@ class Admin extends \Maya\AuthController
                     $excludeFields[] = $field;
             }
         }
-
+        $linked = [];
+        $_collections = $this->app->module('collections')->getCollectionsInGroup(null, false);
+        foreach ($_collections as $name => $meta) {
+            if(isset($meta['fields']) && $meta['fields']){
+                foreach ($meta["fields"] as $field) {
+                    if((
+                        ($field["type"] == "collectionlink" || $field["type"] == "collectionlinkselect") && 
+                        isset($field["options"],$field["options"]["link"]) && 
+                        $field["options"]["link"] == $collection['name']
+                    ) ||  (
+                        $field["type"] == "multiplecollectionlink") &&
+                        isset($field["options"],$field["options"]["links"]) &&
+                        is_array($field["options"]["links"]) && 
+                        in_array($collection['name'], array_map(function($link){
+                            return $link["name"] ?? $link["link"] ?? "";
+                        }, $field["options"]["links"])) 
+                    ){
+                        $field["label"] = empty($field["label"]) ? ucfirst($field["name"]) : $field["label"];
+                        if(!isset($linked[$name])) {
+                            $linked[$name] = $meta;
+                            $linked[$name]["label"] = empty($meta["label"]) ? ucfirst($name) : $meta["label"];
+                            $linked[$name]["createEntryUrl"] = $this->app->routeUrl('/collections/entry/'.$meta['name']);
+                            $linked[$name]["parent"] = $collection['name'];
+                            $linked[$name]["canEdit"] = $this->app->module('collections')->hasaccess($name, 'entries_edit');
+                            $linked[$name]["canCreate"] = $this->app->module('collections')->hasaccess($name, 'entries_create');
+                            $linked[$name]["canDelete"] = $this->app->module('collections')->hasaccess($name, 'entries_delete');
+                            $linked[$name]["icon"] = $this->app->baseUrl(isset($meta['icon']) && $meta['icon'] ? 'assets:app/media/icons/'.$meta['icon']:'collections:icon.svg');
+                            $linked[$name]["description"] = !empty($meta["description"]) ? htmlspecialchars($meta['description'], ENT_QUOTES, 'UTF-8') : "";
+                            $linked[$name]["selectedLink"] = [
+                                "name" => $field["name"],
+                                "label" => $field["label"]
+                            ];
+                            $linked[$name]["@links"] = [];
+                        }
+                        $linked[$name]["@links"][$field["name"]] = $field;
+                    }
+                }
+            }
+        }
         $view = 'collections:views/entry.php';
-
+        $isEdit = isset($entry['_id']) ;
+        $isNew = !$isEdit;
+        $itemLinked = null;
+        if(isset($_REQUEST["link"], $_REQUEST["id"])){
+            $itemLinked = $this->module('collections')->findOne($_REQUEST["link"], ['_id' => $_REQUEST["id"]]);
+            if($itemLinked)
+                $itemLinked["_collectionLink"] = $_REQUEST["link"];
+        }
         if ($override = $this->app->path('#config:collections/' . $collection['name'] . '/views/entry.php')) {
             $view = $override;
         }
-
-        return $this->render($view, compact('collection', 'entry', 'excludeFields'));
+        return $this->render($view, compact('itemLinked','collection', 'entry', 'excludeFields','linked','isNew','isEdit','canEdit'));
     }
 
     public function save_entry($collection)
