@@ -69,6 +69,12 @@ $MAYA_HOST_CONFIG  = [];
 if($MAYA_HOST){
     // check
     $hosts_configs = Spyc::YAMLLoad($MAYA_HOSTS_CONFIG_FILE);
+    if(!isset($hosts_configs[$MAYA_HOST]) && is_array($hosts_configs[$MAYA_HOST])){
+        header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+        // http_response_code(404);
+        exit($MAYA_HOST." not exists");
+    }
+
     if(isset($hosts_configs[$MAYA_HOST]) && is_array($hosts_configs[$MAYA_HOST]))
         $MAYA_HOST_CONFIG = $hosts_configs[$MAYA_HOST];
     if(isset($hosts_configs["default"]) && is_array($hosts_configs["default"])){
